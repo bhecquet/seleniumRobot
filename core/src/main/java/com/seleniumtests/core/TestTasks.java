@@ -165,6 +165,17 @@ public class TestTasks {
 	public static void createOrUpdateParam(String key, String newValue) {
 		createOrUpdateParam(key, newValue, true);
     }
+
+
+	/**
+	 * Method for creating or updating a variable on the seleniumRobot server (or locally if server is not used)
+	 * Moreover, created custom variable is specific to tuple (application, version, test environment)
+	 * @param key			name of the param
+	 * @param newFileValue	value to set
+	 */
+	public static void createOrUpdateParam(String key, File newFileValue) {
+		createOrUpdateParam(key, newFileValue, true);
+    }
 	
 	/**
 	 * Method for creating or updating a variable locally. If selenium server is not used, there is no difference with 'createOrUpdateParam'. 
@@ -188,6 +199,19 @@ public class TestTasks {
 	public static void createOrUpdateParam(String key, String newValue, boolean specificToVersion) {
 		createOrUpdateParam(key, newValue, specificToVersion, TestVariable.TIME_TO_LIVE_INFINITE, false, false);
 	}
+
+	/**
+	 * Method for creating or updating a variable on the seleniumRobot server ONLY. This will raise a ScenarioException if variables are get from
+	 * env.ini file
+	 * Moreover, created custom variable is specific to tuple (application, version, test environment)
+	 * @param key					name of the param
+	 * @param newFileValue				value of the parameter (or new value if we update it)
+	 * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a
+	 * 								current variable.
+	 */
+	public static void createOrUpdateParam(String key, File newFileValue, boolean specificToVersion) {
+		createOrUpdateParam(key, newFileValue, specificToVersion, TestVariable.TIME_TO_LIVE_INFINITE, false, false);
+	}
 		
 	/**
      * Method for creating or updating a variable. If variables are get from seleniumRobot server, this method will update the value on the server
@@ -205,6 +229,23 @@ public class TestTasks {
 		createOrUpdateParam(key, newValue, specificToVersion, timeToLive, reservable, false);
 		
 	}
+
+	/**
+     * Method for creating or updating a variable. If variables are get from seleniumRobot server, this method will update the value on the server
+     * Moreover, created custom variable is specific to tuple (application, version, test environment)
+     * @param key					name of the param
+     * @param newFileValue			value of the parameter (or new value if we update it)
+     * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a
+     * 								current variable.
+     * @param timeToLive			if > 0, this variable will be destroyed after some days (defined by variable). A positive value is mandatory if reservable is set to true
+     * 								because multiple variable can be created
+     * @param reservable			if true, this variable will be set as reservable in variable server. This means it can be used by only one test at the same time
+     * 								True value also means that multiple variables of the same name can be created and a timeToLive > 0 MUST be provided so that server database is regularly purged
+     */
+	public static void createOrUpdateParam(String key, File newFileValue, boolean specificToVersion, int timeToLive, boolean reservable) {
+		createOrUpdateParam(key, newFileValue, specificToVersion, timeToLive, reservable, false);
+
+	}
 	
 	/**
      * Method for creating or updating a variable. If variables are get from seleniumRobot server, this method will update the value on the server
@@ -220,7 +261,31 @@ public class TestTasks {
      * @param localUpdateOnly		it true, value won't be set on remote server
      */
 	public static void createOrUpdateParam(String key, String newValue, boolean specificToVersion, int timeToLive, boolean reservable, boolean localUpdateOnly) {
-		
+		createOrUpdateParam(key, (Object)newValue, specificToVersion, timeToLive, reservable, localUpdateOnly);
+	}
+
+	/**
+	 * Method for creating or updating a variable. If variables are get from seleniumRobot server, this method will update the value on the server
+	 * Moreover, created custom variable is specific to tuple (application, version, test environment)
+	 * @param key					name of the param
+	 * @param newFileValue			value of the parameter (or new value if we update it)
+	 * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a
+	 * 								current variable.
+	 * @param timeToLive			if > 0, this variable will be destroyed after some days (defined by variable). A positive value is mandatory if reservable is set to true
+	 * 								because multiple variable can be created
+	 * @param reservable			if true, this variable will be set as reservable in variable server. This means it can be used by only one test at the same time
+	 * 								True value also means that multiple variables of the same name can be created and a timeToLive > 0 MUST be provided so that server database is regularly purged
+	 * @param localUpdateOnly		it true, value won't be set on remote server
+	 */
+	public static void createOrUpdateParam(String key, File newFileValue, boolean specificToVersion, int timeToLive, boolean reservable, boolean localUpdateOnly) {
+		createOrUpdateParam(key, (Object)newFileValue, specificToVersion, timeToLive, reservable, localUpdateOnly);
+	}
+
+	private static void createOrUpdateParam(String key, Object newValue, boolean specificToVersion, int timeToLive, boolean reservable, boolean localUpdateOnly) {
+		if (newValue == null) {
+			newValue = "";
+		}
+
 		SeleniumRobotVariableServerConnector variableServer = SeleniumTestsContextManager.getThreadContext().getVariableServer();
 		
 		if (reservable && timeToLive <= 0) {
@@ -230,10 +295,15 @@ public class TestTasks {
 		// check if we update an existing variable
 		TestVariable variable = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(key);
 		if (variable == null || reservable) {
-			variable = new TestVariable(key, newValue);	
-		} else {
-			variable.setValue(newValue);
+			variable = new TestVariable(key, "");
 		}
+
+		if (newValue instanceof File newFileValue) {
+			variable.setValue(newFileValue);
+		} else {
+			variable.setValue(newValue.toString());
+		}
+
 		variable.setReservable(reservable);
 		variable.setTimeToLive(timeToLive);
 		if (variableServer != null && !localUpdateOnly) {

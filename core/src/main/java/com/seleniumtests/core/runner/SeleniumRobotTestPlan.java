@@ -198,6 +198,16 @@ public class SeleniumRobotTestPlan {
     public void createOrUpdateParam(String key, String value) {
     	TestTasks.createOrUpdateParam(key, value);
     }
+    /**
+	 * Method for creating or updating a variable on the seleniumRobot server (or locally if server is not used)
+     * Moreover, created custom variable is specific to tuple (application, version, test environment)
+     * Variable will be stored as a variable of the current tested application
+     * @param key				name of the param
+     * @param value				value of the parameter (or new value if we update it)
+     */
+    public void createOrUpdateParam(String key, File value) {
+    	TestTasks.createOrUpdateParam(key, value);
+    }
     
     /**
 	 * Method for creating or updating a variable locally. If selenium server is not used, there is no difference with 'createOrUpdateParam'. 
@@ -220,6 +230,18 @@ public class SeleniumRobotTestPlan {
     public void createOrUpdateParam(String key, String value, boolean specificToVersion) {
     	TestTasks.createOrUpdateParam(key, value, specificToVersion);
     }
+
+    /**
+     * Method for creating or updating a variable on the seleniumRobot server ONLY. This will raise a ScenarioException if variables are get from
+     * env.ini file
+     * Moreover, created custom variable is specific to tuple (application, version, test environment)
+     * @param key					name of the param
+     * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a
+     * 								current variable.
+     */
+    public void createOrUpdateParam(String key, File value, boolean specificToVersion) {
+    	TestTasks.createOrUpdateParam(key, value, specificToVersion);
+    }
     
     /**
      * Method for creating or updating a variable. If variables are get from seleniumRobot server, this method will update the value on the server
@@ -233,6 +255,21 @@ public class SeleniumRobotTestPlan {
      * 								True value also means that multiple variables of the same name can be created and a timeToLive > 0 MUST be provided so that server database is regularly purged
      */
     public void createOrUpdateParam(String key, String value, boolean specificToVersion, int timeToLive, boolean reservable) {
+    	TestTasks.createOrUpdateParam(key, value, specificToVersion, timeToLive, reservable);
+    }
+
+    /**
+     * Method for creating or updating a variable. If variables are get from seleniumRobot server, this method will update the value on the server
+     * Moreover, created custom variable is specific to tuple (application, version, test environment)
+     * @param key					name of the param
+     * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a
+     * 								current variable.
+     * @param timeToLive			if > 0, this variable will be destroyed after some days (defined by variable). A positive value is mandatory if reservable is set to true
+     * 								because multiple variable can be created
+     * @param reservable			if true, this variable will be set as reservable in variable server. This means it can be used by only one test at the same time
+     * 								True value also means that multiple variables of the same name can be created and a timeToLive > 0 MUST be provided so that server database is regularly purged
+     */
+    public void createOrUpdateParam(String key, File value, boolean specificToVersion, int timeToLive, boolean reservable) {
     	TestTasks.createOrUpdateParam(key, value, specificToVersion, timeToLive, reservable);
     }
 

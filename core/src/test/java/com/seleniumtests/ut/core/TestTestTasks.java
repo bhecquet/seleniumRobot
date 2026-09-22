@@ -108,9 +108,7 @@ public class TestTestTasks extends ConnectorsTest {
 	 */
 	@Test(groups= {"ut"})
 	public void testUpdateNewVariableLocally(final ITestContext testNGCtx) throws Exception {
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		})) {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true))) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
@@ -119,7 +117,7 @@ public class TestTestTasks extends ConnectorsTest {
 			TestTasks.createOrUpdateLocalParam("key", "value");
 			
 			// check upsert has been NOT called
-			verify(mockedVariableServer.constructed().get(0), never()).upsertVariable(new TestVariable("key", "value"), true);
+			verify(mockedVariableServer.constructed().getFirst(), never()).upsertVariable(new TestVariable("key", "value"), true);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key").getValue(), "value");
@@ -151,7 +149,7 @@ public class TestTestTasks extends ConnectorsTest {
 			TestTasks.createOrUpdateParam("key", "value");
 			
 			// check upsert has been called
-			verify(mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable("key", "value"), true);
+			verify(mockedVariableServer.constructed().getFirst()).upsertVariable(new TestVariable("key", "value"), true);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
@@ -160,7 +158,36 @@ public class TestTestTasks extends ConnectorsTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
 		}
 	}
-	
+
+	@Test(groups= {"ut"})
+	public void testUpdateNewVariableWithFile(final ITestContext testNGCtx) throws Exception {
+
+		File tmpFile = new File("/home/foo/tmp.txt");
+		TestVariable varToReturn = new TestVariable(10, "key", tmpFile, false, TestVariable.TEST_VARIABLE_PREFIX + "key");
+
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
+		})) {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+
+
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			TestTasks.createOrUpdateParam("key", tmpFile);
+
+			// check upsert has been called
+			verify(mockedVariableServer.constructed().getFirst()).upsertVariable(new TestVariable("key", tmpFile), true);
+
+			// check configuration is updated
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+
 	/**
 	 * Check that if variable exists but we request a reservable variable, it's recreated so that we can have multiple variables
 	 */
@@ -182,7 +209,7 @@ public class TestTestTasks extends ConnectorsTest {
 			TestTasks.createOrUpdateParam("key", "value", false, 3, true);
 			
 			// check upsert has been called
-			verify(mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable(null, "key", "value", true, "key", 3, null), false);
+			verify(mockedVariableServer.constructed().getFirst()).upsertVariable(new TestVariable(null, "key", "value", true, "key", 3, null), false);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
@@ -213,7 +240,7 @@ public class TestTestTasks extends ConnectorsTest {
 			TestTasks.createOrUpdateParam("key", "value", false, 3, false);
 			
 			// check upsert has been called
-			verify(mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable(10, "key", "value", false, "key", 3, null), false);
+			verify(mockedVariableServer.constructed().getFirst()).upsertVariable(new TestVariable(10, "key", "value", false, "key", 3, null), false);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
@@ -243,7 +270,7 @@ public class TestTestTasks extends ConnectorsTest {
 			TestTasks.createOrUpdateParam("key", "value", false);
 			
 			// check upsert has been called
-			verify(mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable("key", "value"), false);
+			verify(mockedVariableServer.constructed().getFirst()).upsertVariable(new TestVariable("key", "value"), false);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
@@ -296,7 +323,7 @@ public class TestTestTasks extends ConnectorsTest {
 			TestTasks.createOrUpdateParam("key", "value", false, 1, true);
 			
 			// check upsert has been called
-			verify(mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable(null, "key", "value", true, "key", 1, null), false);
+			verify(mockedVariableServer.constructed().getFirst()).upsertVariable(new TestVariable(null, "key", "value", true, "key", 1, null), false);
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -317,9 +344,7 @@ public class TestTestTasks extends ConnectorsTest {
 
 	@Test(groups= {"ut"})
 	public void testDeleteVariable(final ITestContext testNGCtx) throws Exception {
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		})) {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true))) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
@@ -329,7 +354,7 @@ public class TestTestTasks extends ConnectorsTest {
 			TestTasks.deleteParam("key");
 
 			// check upsert has been called
-			verify(mockedVariableServer.constructed().get(0)).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
+			verify(mockedVariableServer.constructed().getFirst()).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
 			Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"));
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -342,9 +367,7 @@ public class TestTestTasks extends ConnectorsTest {
 	 */
 	@Test(groups= {"ut"})
 	public void testDeleteVariableNoId(final ITestContext testNGCtx) throws Exception {
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		})) {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true))) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
@@ -354,7 +377,7 @@ public class TestTestTasks extends ConnectorsTest {
 			TestTasks.deleteParam("key");
 
 			// check upsert has been called
-			verify(mockedVariableServer.constructed().get(0), never()).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
+			verify(mockedVariableServer.constructed().getFirst(), never()).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
 			Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"));
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -364,9 +387,7 @@ public class TestTestTasks extends ConnectorsTest {
 
 	@Test(groups= {"ut"})
 	public void testDeleteVariableNotPresent(final ITestContext testNGCtx) throws Exception {
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		})) {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true))) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
@@ -375,7 +396,7 @@ public class TestTestTasks extends ConnectorsTest {
 			TestTasks.deleteParam("key");
 
 			// check upsert has been called
-			verify(mockedVariableServer.constructed().get(0), never()).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
+			verify(mockedVariableServer.constructed().getFirst(), never()).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -730,9 +751,9 @@ public class TestTestTasks extends ConnectorsTest {
 			TestTasks.addStep("foo");
 			TestTasks.addStep(null); // add a final step so that previous step is written
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().size(), 1);
-			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(0).getName(), "foo");
-			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(0).getAction(), "foo");
-			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(0).getOrigin(), TestTestTasks.class); // check origin is the class that made the call
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().getFirst().getName(), "foo");
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().getFirst().getAction(), "foo");
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().getFirst().getOrigin(), TestTestTasks.class); // check origin is the class that made the call
 		} finally {
 			GenericTest.resetTestNGResultAndLogger();
 		}

@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import com.seleniumtests.customexception.SeleniumRobotServerFetchVariablesException;
 import com.seleniumtests.customexception.SeleniumRobotServerHttpException;
 import com.seleniumtests.util.helper.WaitHelper;
+import kong.unirest.core.*;
 import org.apache.commons.io.FilenameUtils;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -35,10 +36,6 @@ import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.SeleniumRobotServer404Exception;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 
-import kong.unirest.core.GetRequest;
-import kong.unirest.core.HttpResponse;
-import kong.unirest.core.MultipartBody;
-import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
@@ -53,6 +50,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	private static final String FIELD_TIME_TO_LIVE = "timeToLive";
 	private static final String FIELD_VERSION = "version";
 	private static final String FIELD_VALUE = "value";
+	private static final String FIELD_FILE_UPLOAD = "fileUpload";
 	public static final String VARIABLE_API_URL = "/variable/api/variable/";
 	public static final String EXISTING_VARIABLE_API_URL = "/variable/api/variable/%d/";
 	public static final String VARIABLE_FILE_API_URL = "/variable/api/variable/%d/file";
@@ -244,7 +242,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 */
 	public File getVariableFile(TestVariable variable) {
         try {
-            URI fileUri = new URI(variable.getFileName());
+            URI fileUri = new URI(variable.getRemoteFileUrl());
             String fileName = FilenameUtils.getName(fileUri.getPath());
             File varDataFile = File.createTempFile("varfile-", "-" + fileName);
             varDataFile.deleteOnExit();
@@ -331,11 +329,21 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * @param variable	variable to update
 	 */
 	private TestVariable updateVariable(TestVariable variable) {
-		JSONObject variableJson = getJSonResponse(buildPatchRequest(String.format("%s" + EXISTING_VARIABLE_API_URL, url, variable.getId()))
-				.field(FIELD_VALUE, variable.getValue())
+		MultipartBody request = buildPatchRequest(String.format("%s" + EXISTING_VARIABLE_API_URL, url, variable.getId()))
+
 				.field(FIELD_RESERVABLE, String.valueOf(variable.isReservable()))
-				.field(FIELD_TIME_TO_LIVE, String.valueOf(variable.getTimeToLive())));
-		
+				.field(FIELD_TIME_TO_LIVE, String.valueOf(variable.getTimeToLive()));
+
+		if (variable.getRemoteFileUrl() != null) {
+			request = request.field(FIELD_FILE_UPLOAD, variable._getFile())
+					.field(FIELD_VALUE, "");
+		} else {
+			request = request.field(FIELD_VALUE, variable._getValue())
+					.field(FIELD_FILE_UPLOAD, (File) null);
+		}
+
+		JSONObject variableJson = getJSonResponse(request);
+
 		return TestVariable.fromJsonObject(variableJson, applicationId, SeleniumTestsContextManager.getApplicationName());
 	}
 
@@ -365,7 +373,6 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	private TestVariable createVariable(TestVariable variable, boolean specificToVersion) {
 		MultipartBody request = buildPostRequest(url + VARIABLE_API_URL)
 				.field(FIELD_NAME, TestVariable.TEST_VARIABLE_PREFIX + variable.getName())
-				.field(FIELD_VALUE, variable.getValue().toString())
 				.field(FIELD_RESERVABLE, String.valueOf(variable.isReservable()))
 				.field(FIELD_ENVIRONMENT, environmentId.toString())
 				.field(FIELD_APPLICATION, applicationId.toString())
@@ -374,6 +381,15 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 		
 		if (specificToVersion) {
 			request = request.field(FIELD_VERSION, versionId.toString());
+		}
+
+		if (variable._getFile() != null) {
+			request = request.field(FIELD_FILE_UPLOAD, variable._getFile())
+					.field(FIELD_VALUE, "");
+
+		} else {
+			request = request.field(FIELD_VALUE, variable._getValue())
+					.field(FIELD_FILE_UPLOAD, (File)null);
 		}
 		
 		JSONObject variableJson = getJSonResponse(request);

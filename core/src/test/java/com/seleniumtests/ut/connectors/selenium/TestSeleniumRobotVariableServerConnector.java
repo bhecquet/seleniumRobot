@@ -25,6 +25,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -230,8 +232,8 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		Map<String, TestVariable> variables = connector.getVariables();
 		Assert.assertEquals(variables.get("key1").getValue(), "value1");
 		Assert.assertEquals(variables.get("key2").getValue(), "value2");
-		Assert.assertNull(variables.get("key1").getFileName()); //Check with uploadFile: null in the json
-		Assert.assertNull(variables.get("key2").getFileName()); //Check with no key uploadFile in the json
+		Assert.assertNull(variables.get("key1").getRemoteFileUrl()); //Check with uploadFile: null in the json
+		Assert.assertNull(variables.get("key2").getRemoteFileUrl()); //Check with no key uploadFile in the json
 		
 		verify(variablesRequest).queryString("reserve", true);
 		verify(variablesRequest).queryString("version", 4);
@@ -252,8 +254,8 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
         Map<String, TestVariable> variables = connector.getVariables();
 
         Assert.assertEquals(variables.get("key1").getValue(), "value1");
-        Assert.assertNull(variables.get("key1").getFileName());
-        Assert.assertEquals(variables.get("key3").getFileName(), "http://127.0.0.1:8000/media/appName/testStandardDataProvider.csv");
+        Assert.assertNull(variables.get("key1").getRemoteFileUrl());
+        Assert.assertEquals(variables.get("key3").getRemoteFileUrl(), "http://127.0.0.1:8000/media/appName/testStandardDataProvider.csv");
         Assert.assertEquals(variables.get("key3").getValue().toString(), Paths.get(SeleniumTestsContextManager.getDatasetPath(), "DEV", "testStandardDataProvider.csv").toString());
     }
 
@@ -458,6 +460,8 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testVariableUpdateExistingVariable() throws UnirestException {
 		
 		configureMockedVariableServerConnection();
+		MultipartBody updateVariableRequestWithFile = (MultipartBody) createServerMock(SERVER_URL, "PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 12), 200, "{'id': 12, 'name': 'custom.test.variable.key', 'value': 'value', 'uploadFile': null, 'reservable': false}", "body");
+
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		TestVariable existingVariable = new TestVariable(12, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
 		TestVariable variable = connector.upsertVariable(existingVariable, true);
@@ -465,6 +469,32 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		mockedUnirest.get().verify(() -> Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL)));
 		
 		Assert.assertEquals(variable.getValue(), "value");
+
+		// check value is sent, and fileUpload set to null
+		verify(updateVariableRequestWithFile).field("value", "value");
+		verify(updateVariableRequestWithFile).field("fileUpload", (File)null);
+	}
+
+	@Test(groups= {"ut"})
+	public void testVariableUpdateExistingVariableContainingFile() throws UnirestException, IOException {
+
+		File tmpFile = Files.createTempFile("tmp", "tmp").toFile();
+		tmpFile.deleteOnExit();
+
+		configureMockedVariableServerConnection();
+		MultipartBody updateVariableRequestWithFile = (MultipartBody) createServerMock(SERVER_URL, "PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 12), 200, "{'id': 12, 'name': 'custom.test.variable.key', 'value': 'value', 'uploadFile': null, 'reservable': false}", "body");
+
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		TestVariable existingVariable = new TestVariable(12, "key", tmpFile, false, TestVariable.TEST_VARIABLE_PREFIX + "key");
+		TestVariable variable = connector.upsertVariable(existingVariable, true);
+
+		mockedUnirest.get().verify(() -> Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL)));
+
+		Assert.assertEquals(variable.getValue(), "value");
+
+		// check value is sent as empty, and fileUpload set to a file
+		verify(updateVariableRequestWithFile).field("value", "");
+		verify(updateVariableRequestWithFile).field(eq("fileUpload"), any(File.class));
 	}
 
 	@Test(groups= {"ut"})
@@ -562,12 +592,13 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testVariableRecreateExistingVariable() throws UnirestException {
 		
 		configureMockedVariableServerConnection();
+
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
-		TestVariable existingVariable = new TestVariable(12, "key", "value", false, "key");
+		TestVariable existingVariable = new TestVariable(22, "key", "value", false, "key");
 		TestVariable variable = connector.upsertVariable(existingVariable, true);
 
 		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL)));
-		
+
 		Assert.assertEquals(variable.getValue(), "value");
 	}
 	
@@ -575,6 +606,8 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testVariableCreateNewVariable() throws UnirestException {
 		
 		configureMockedVariableServerConnection();
+		MultipartBody createVariableRequestWithFile = (MultipartBody) createServerMock(SERVER_URL, "POST", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{'id': 13, 'name': 'custom.test.variable.key', 'value': 'value', 'uploadFile': null, 'reservable': false}", "body");
+
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		TestVariable existingVariable = new TestVariable("key", "value");
 		TestVariable variable = connector.upsertVariable(existingVariable, true);
@@ -584,6 +617,33 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		Assert.assertEquals(variable.getValue(), "value");
 		Assert.assertEquals(variable.getName(), "key");
 		Assert.assertEquals(variable.getInternalName(), TestVariable.TEST_VARIABLE_PREFIX + "key");
+
+		// check value is sent, and fileUpload set to null
+		verify(createVariableRequestWithFile).field("value", "value");
+		verify(createVariableRequestWithFile).field("fileUpload", (File)null);
+	}
+
+	@Test(groups= {"ut"})
+	public void testVariableCreateNewVariableWithFile() throws UnirestException, IOException {
+		File tmpFile = Files.createTempFile("tmp", "tmp").toFile();
+		tmpFile.deleteOnExit();
+
+		configureMockedVariableServerConnection();
+		MultipartBody createVariableRequestWithFile = (MultipartBody) createServerMock(SERVER_URL, "POST", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{'id': 13, 'name': 'custom.test.variable.key', 'value': 'value', 'uploadFile': null, 'reservable': false}", "body");
+
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		TestVariable existingVariable = new TestVariable("key", tmpFile);
+		TestVariable variable = connector.upsertVariable(existingVariable, true);
+
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL)));
+
+		Assert.assertEquals(variable.getValue(), "value");
+		Assert.assertEquals(variable.getName(), "key");
+		Assert.assertEquals(variable.getInternalName(), TestVariable.TEST_VARIABLE_PREFIX + "key");
+
+		// check value is sent as empty, and fileUpload set to provided file
+		verify(createVariableRequestWithFile).field("value", "");
+		verify(createVariableRequestWithFile).field(eq("fileUpload"), any(File.class));
 	}
 
 	@Test(groups= {"ut"})

@@ -567,6 +567,8 @@ public class ConnectorsTest extends MockitoTest {
 		when(postRequest.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
 		when(postRequest.field(anyString(), anyDouble())).thenReturn(requestMultipartBody);
 		when(postRequest.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
+		when(postRequest.field(anyString(), (File)isNull())).thenReturn(requestMultipartBody);
+		when(postRequest.field(anyString(), (String)isNull())).thenReturn(requestMultipartBody);
 		when(postRequest.basicAuth(anyString(), anyString())).thenReturn(postRequest);
 		when(postRequest.headerReplace(anyString(), anyString())).thenReturn(postRequest);
 		when(postRequest.queryString(anyString(), anyString())).thenReturn(postRequest);
@@ -576,6 +578,7 @@ public class ConnectorsTest extends MockitoTest {
 		when(postRequest.header(anyString(), anyString())).thenReturn(postRequest);
 		when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
 		when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
+		when(requestMultipartBody.field(anyString(), (File)isNull())).thenReturn(requestMultipartBody);
 		when(requestMultipartBody.asString()).thenReturn(response);
 		doReturn(response).when(postRequest).asString();
 		when(postRequest.getUrl()).thenReturn(serverUrl);

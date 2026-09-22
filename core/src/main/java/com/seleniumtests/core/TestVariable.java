@@ -17,11 +17,11 @@
  */
 package com.seleniumtests.core;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.customexception.ConfigurationException;
@@ -34,6 +34,7 @@ import kong.unirest.core.json.JSONObject;
 public class TestVariable {
 
 	private static final Logger logger = SeleniumRobotLogger.getLogger(TestVariable.class);
+	private static final String NO_REMOTE_FILE = "no_remote_file"; // defined when variable is created locally and so, no file correspond remotely
 	public static final String TEST_VARIABLE_PREFIX = "custom.test.variable.";
 	public static final int TIME_TO_LIVE_INFINITE = -1; // value for saying that varible will never be deleted
 	private Integer id;
@@ -46,8 +47,10 @@ public class TestVariable {
 	private int timeToLive;
 	private Integer application;
 	private String applicationName;
-	private String fileName; //if the variable come from the selenium-server and has a file as value, it will be set here
-	
+
+	// priority to file over string value
+	private String remoteFileUrl; //if the variable come from the selenium-server and has a file as value, it will be set here
+	private File file;
 	
 	/**
 	 * 
@@ -59,12 +62,16 @@ public class TestVariable {
 	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName) {
 		this(id, name, value, reservable, internalName, TIME_TO_LIVE_INFINITE, null);
 	}
+
+	public TestVariable(Integer id, String name, File value, boolean reservable, String internalName) {
+		this(id, name, value, reservable, internalName, TIME_TO_LIVE_INFINITE, null, null);
+	}
 	
 	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName, int timeToLive, LocalDateTime creationDate) {
 		this(id, name, value, reservable, internalName, timeToLive, creationDate, null, null);
 	}
 
-	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName, int timeToLive, LocalDateTime creationDate, Integer application, String fileName) {
+	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName, int timeToLive, LocalDateTime creationDate, Integer application, String remoteFileUrl) {
 		this.id = id;
 		this.name = name;
 		this.internalName = internalName;
@@ -73,7 +80,18 @@ public class TestVariable {
 		this.timeToLive = timeToLive;
 		this.creationDate = creationDate;
 		this.application = application;
-		this.fileName = fileName;
+		this.remoteFileUrl = remoteFileUrl;
+	}
+	public TestVariable(Integer id, String name, File value, boolean reservable, String internalName, int timeToLive, LocalDateTime creationDate, Integer application) {
+		this.id = id;
+		this.name = name;
+		this.internalName = internalName;
+		this.reservable = reservable;
+		this.timeToLive = timeToLive;
+		this.creationDate = creationDate;
+		this.application = application;
+		this.file = value;
+		this.remoteFileUrl = value.getName();
 	}
 	
 	/**
@@ -83,6 +101,10 @@ public class TestVariable {
 	 */
 	public TestVariable(String name, String value) {
 		this(null, name, value, false, name, TIME_TO_LIVE_INFINITE, null);
+	}
+
+	public TestVariable(String name, File value) {
+		this(null, name, value, false, name);
 	}
 
 	/**
@@ -100,9 +122,9 @@ public class TestVariable {
 		} catch (Exception e) {
 			creationDate = null;
 		}
-		
+
 		TestVariable variable = new TestVariable(variableJson.optInt("id", -1),
-							name, 
+							name,
 							variableJson.getString("value"),
 							variableJson.optBoolean("reservable", false),
 							variableJson.getString("name"),
@@ -135,13 +157,34 @@ public class TestVariable {
 				timeToLive,
 				creationDate,
 				application,
-				fileName);
+				remoteFileUrl);
 		variableCopy.applicationName = applicationName;
+		variableCopy.file = file;
 		return variableCopy;
 	}
-	
+
+	/**
+	 * If setting value whereas a file is already set, file will be removed
+	 */
 	public void setValue(String newValue) {
 		value = newValue;
+		if (remoteFileUrl != null) {
+			logger.warn("file removed for variable {}, as value is set", name);
+			remoteFileUrl = null;
+			file = null;
+		}
+	}
+
+	/**
+	 * If setting a file and a value is already set, putting this variable on server will remove value
+	 */
+	public void setValue(File file) {
+		this.file = file;
+		this.remoteFileUrl = NO_REMOTE_FILE;
+		if (value != null && !value.isEmpty()) {
+			logger.warn("value removed for variable {}, as file is set", name);
+			value = "";
+		}
 	}
 
 	public boolean isReservable() {
@@ -164,6 +207,17 @@ public class TestVariable {
 		return name;
 	}
 
+	private File getFile() {
+		if (file == null && this.getRemoteFileUrl() != null && !this.getRemoteFileUrl().equals(NO_REMOTE_FILE)) {
+			try {
+				file = SeleniumTestsContextManager.getThreadContext().getVariableServer().getVariableFile(this);
+			} catch (ConfigurationException e) {
+				logger.warn("Cannot get variable file", e);
+			}
+		}
+		return file;
+	}
+
 	public int getTimeToLive() {
 		return timeToLive;
 	}
@@ -174,8 +228,8 @@ public class TestVariable {
 
 	public Object getValue() {
 		try {
-			if (this.getFileName() != null) {				
-                return SeleniumTestsContextManager.getThreadContext().getVariableServer().getVariableFile(this);
+			if (this.getRemoteFileUrl() != null) {
+                return getFile();
             } else {
             	String interpolatedValue = StringUtility.interpolateString(value, SeleniumTestsContextManager.getThreadContext()); 
                 return Objects.requireNonNullElse(interpolatedValue, "");
@@ -219,14 +273,22 @@ public class TestVariable {
 	public void setApplication(Integer id) {
 		this.application = id;
 	}
-	
-	public void setFileName(String fileName) {
-        this.fileName = fileName;
+
+    public String getRemoteFileUrl() {
+        return remoteFileUrl;
     }
 
-    public String getFileName() {
-        return fileName;
-    }
+	/**
+	 * direct access to 'file' field
+	 * @return
+	 */
+	public File _getFile() {
+		return file;
+	}
+
+	public String _getValue() {
+		return value;
+	}
 
 	@Override
 	public String toString() {
