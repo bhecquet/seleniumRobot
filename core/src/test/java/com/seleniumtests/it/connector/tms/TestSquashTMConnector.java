@@ -663,4 +663,266 @@ public class TestSquashTMConnector extends GenericTest {
         }
 
     }
+    
+    /**
+     * Method allowing to test recordResult on Squash TM
+     * provide following properties:
+     * url
+     * token
+     * project
+     * testCaseId: the ID of an existing test case in Squash TM
+     * <p>
+     * Then check in Squash TM that result has been recorded =>
+     * - campaign "Selenium <testContext.getName()>"
+     * - iteration corresponding to the current application version
+     * - a test plan item for the given test case, with execution status SUCCESS
+     */
+    @Test(groups = "squash", enabled = false)
+    public void testRecordResultSuccessNoMatchingStep(ITestContext context) {
+
+        String testCaseId = System.getProperty("testCaseId", "928126");
+        SeleniumTestsContextManager.getThreadContext().getConfiguration().put("tms.testId", new TestVariable("tms.testId", testCaseId));
+
+        SquashTMConnector connector = new SquashTMConnector(System.getProperty("url"), null, System.getProperty("token"), System.getProperty("project"));
+
+        ITestResult result = new RecordResultTestResult(context, true, 1, null);
+        connector.recordResult(result);
+    }
+
+    @Test(groups = "squash", enabled = false)
+    public void testRecordResultSuccessMatchingSteps(ITestContext context) {
+
+        String testCaseId = System.getProperty("testCaseId", "928126");
+        SeleniumTestsContextManager.getThreadContext().getConfiguration().put("tms.testId", new TestVariable("tms.testId", testCaseId));
+
+        TestStep step1 = new TestStep("Open the application", "Step 1", null, null, List.of(), true,
+                com.seleniumtests.core.Step.RootCause.NONE, null, false,
+                "6F4A22 - Open the application", "Application is displayed");
+        TestStep step2 = new TestStep("Login with valid credentials", "Step 2", null, null, List.of(), true,
+                com.seleniumtests.core.Step.RootCause.NONE, null, false,
+                "E31AD1 - Login with valid credentials", "User is logged in successfully");
+        TestStep step3 = new TestStep("Step with a screenshot", "Step 3", null, null, List.of(), true,
+                com.seleniumtests.core.Step.RootCause.NONE, null, false,
+                "2D5CE4 - Step with a screenshot", "Check the attachments");
+        step1.setFailed(false);
+        step2.setFailed(false);
+        step3.setFailed(false);
+        SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().addAll(List.of(step1, step2, step3));
+
+        SquashTMConnector connector = new SquashTMConnector(System.getProperty("url"), null, System.getProperty("token"), System.getProperty("project"));
+
+        ITestResult result = new RecordResultTestResult(context, true, 1, null);
+        connector.recordResult(result);
+    }
+
+    /**
+     * Method allowing to test recordResult on Squash TM, when test is in failure
+     * provide following properties:
+     * url
+     * token
+     * project
+     * testCaseId: the ID of an existing test case in Squash TM
+     * <p>
+     * Test steps declared below are sent to the context so that, when "updateTestManager" is enabled
+     * on the test case, execution steps in Squash TM (matching pattern "&lt;stepId&gt; - ...") get their
+     * status updated according to the corresponding SeleniumRobot step status.
+     * <p>
+     * Then check in Squash TM that result has been recorded =>
+     * - execution status is FAILURE, with a comment containing the exception message
+     * - execution steps status has been updated according to test steps result
+     */
+    @Test(groups = "squash", enabled = false)
+    public void testRecordResultFailure(ITestContext context) {
+
+        String testCaseId = System.getProperty("testCaseId", "928126");
+        SeleniumTestsContextManager.getThreadContext().getConfiguration().put("tms.testId", new TestVariable("tms.testId", testCaseId));
+
+        // declare test steps, matching the execution steps already defined on the Squash TM test case
+        // (see testUpdateTestCase to push these steps as execution steps beforehand)
+        TestStep step1 = new TestStep("Step 1", "yolo", null, null, List.of(), true,
+                com.seleniumtests.core.Step.RootCause.NONE, null, false,
+                "wesh", "Application is displayed");
+
+        TestStep step2 = new TestStep("Step 2", "Step 2", null, null, List.of(), true,
+                com.seleniumtests.core.Step.RootCause.NONE, null, false,
+                "Login with valid credentials", "User is logged in successfully");
+
+        step1.setFailed(false);
+        step2.setFailed(true);
+
+        SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().addAll(List.of(step1, step2));
+
+        SquashTMConnector connector = new SquashTMConnector(System.getProperty("url"), null, System.getProperty("token"), System.getProperty("project"));
+
+        ITestResult result = new RecordResultTestResult(context, false, 2, new Exception("Element not found on page"));
+        connector.recordResult(result);
+    }
+
+    /**
+     * Method allowing to test recordResult on Squash TM, when test is in failure
+     * provide following properties:
+     * url
+     * token
+     * project
+     * testCaseId: the ID of an existing test case in Squash TM
+     * <p>
+     * Test steps declared below are sent to the context so that, when "updateTestManager" is enabled
+     * on the test case, execution steps in Squash TM (matching pattern "&lt;stepId&gt; - ...") get their
+     * status updated according to the corresponding SeleniumRobot step status.
+     * <p>
+     * Then check in Squash TM that result has been recorded =>
+     * - execution status is FAILURE, with a comment containing the exception message
+     * - execution steps status has been updated according to test steps result
+     */
+    @Test(groups = "squash", enabled = false)
+    public void testRecordResultFailureMatchingStep(ITestContext context) {
+
+        String testCaseId = System.getProperty("testCaseId", "928126");
+        SeleniumTestsContextManager.getThreadContext().getConfiguration().put("tms.testId", new TestVariable("tms.testId", testCaseId));
+
+        // declare test steps, matching the execution steps already defined on the Squash TM test case
+        // (see testUpdateTestCase to push these steps as execution steps beforehand)
+        TestStep step1 = new TestStep("Open the application", "Step 1", null, null, List.of(), true,
+                com.seleniumtests.core.Step.RootCause.NONE, null, false,
+                "6F4A22 - Open the application", "Application is displayed");
+        TestStep step2 = new TestStep("Login with valid credentials", "Step 2", null, null, List.of(), true,
+                com.seleniumtests.core.Step.RootCause.NONE, null, false,
+                "E31AD1 - Login with valid credentials", "User is logged in successfully");
+        TestStep step3 = new TestStep("Step with a screenshot", "Step 3", null, null, List.of(), true,
+                com.seleniumtests.core.Step.RootCause.NONE, null, false,
+                "2D5CE4 - Step with a screenshot", "Check the attachments");
+        step1.setFailed(false);
+        step2.setFailed(false);
+        step3.setFailed(true);
+        SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().addAll(List.of(step1, step2, step3));
+
+        SquashTMConnector connector = new SquashTMConnector(System.getProperty("url"), null, System.getProperty("token"), System.getProperty("project"));
+
+        ITestResult result = new RecordResultTestResult(context, false, 2, new Exception("Element not found on page"));
+        connector.recordResult(result);
+    }
+
+    /**
+     * Method allowing to test recordResult on Squash TM, when test is in failure
+     * provide following properties:
+     * url
+     * token
+     * project
+     * testCaseId: the ID of an existing test case in Squash TM
+     * <p>
+     * Test steps declared below are sent to the context so that, when "updateTestManager" is enabled
+     * on the test case, execution steps in Squash TM (matching pattern "&lt;stepId&gt; - ...") get their
+     * status updated according to the corresponding SeleniumRobot step status.
+     * <p>
+     * Then check in Squash TM that result has been recorded =>
+     * - execution status is FAILURE, with a comment containing the exception message
+     * - execution steps status has been updated according to test steps result
+     */
+    @Test(groups = "squash", enabled = false)
+    public void testRecordResultFailureMatchingStepFailThenNoFail(ITestContext context) {
+
+        String testCaseId = System.getProperty("testCaseId", "928126");
+        SeleniumTestsContextManager.getThreadContext().getConfiguration().put("tms.testId", new TestVariable("tms.testId", testCaseId));
+
+        // declare test steps, matching the execution steps already defined on the Squash TM test case
+        // (see testUpdateTestCase to push these steps as execution steps beforehand)
+        TestStep step1 = new TestStep("Open the application", "Step 1", null, null, List.of(), true,
+                com.seleniumtests.core.Step.RootCause.NONE, null, false,
+                "6F4A22 - Open the application", "Application is displayed");
+        TestStep step2 = new TestStep("Login with valid credentials", "Step 2", null, null, List.of(), true,
+                com.seleniumtests.core.Step.RootCause.NONE, null, false,
+                "E31AD1 - Login with valid credentials", "User is logged in successfully");
+        TestStep step3 = new TestStep("Step with a screenshot", "Step 3", null, null, List.of(), true,
+                com.seleniumtests.core.Step.RootCause.NONE, null, false,
+                "2D5CE4 - Step with a screenshot", "Check the attachments");
+        step1.setFailed(false);
+        step2.setFailed(true);
+        step3.setFailed(false);
+        SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().addAll(List.of(step1, step2, step3));
+
+        SquashTMConnector connector = new SquashTMConnector(System.getProperty("url"), null, System.getProperty("token"), System.getProperty("project"));
+
+        ITestResult result = new RecordResultTestResult(context, false, 2, new Exception("Element not found on page"));
+        connector.recordResult(result);
+    }
+
+    /**
+     * Custom ITestResult used to test recordResult, allowing to control success/failure status,
+     * the raised exception and providing the testId custom attribute
+     */
+    class RecordResultTestResult extends LocalTestResult {
+
+        private final boolean success;
+        private final int status;
+        private final Throwable throwable;
+
+        public RecordResultTestResult(ITestContext context, boolean success, int status, Throwable throwable) {
+            super(context);
+            this.success = success;
+            this.status = status;
+            this.throwable = throwable;
+        }
+
+        @Override
+        public boolean isSuccess() {
+            return success;
+        }
+
+        @Override
+        public int getStatus() {
+            return status;
+        }
+
+        @Override
+        public Throwable getThrowable() {
+            return throwable;
+        }
+
+        @Override
+        public ITestNGMethod getMethod() {
+            ITestNGMethod originalMethod = context.getAllTestMethods()[0];
+            return new DelegatingTestNGMethod(originalMethod) {
+                @Override
+                public CustomAttribute[] getAttributes() {
+                    CustomAttribute testIdAttr = new CustomAttribute() {
+                        @Override
+                        public Class<? extends Annotation> annotationType() {
+                            return CustomAttribute.class;
+                        }
+
+                        @Override
+                        public String[] values() {
+                            return new String[]{System.getProperty("testCaseId", "928126")};
+                        }
+
+                        @Override
+                        public String name() {
+                            return "testId";
+                        }
+                    };
+
+                    CustomAttribute updateTestManagerAttr = new CustomAttribute() {
+                        @Override
+                        public Class<? extends Annotation> annotationType() {
+                            return CustomAttribute.class;
+                        }
+
+                        @Override
+                        public String[] values() {
+                            return new String[]{"true"};
+                        }
+
+                        @Override
+                        public String name() {
+                            return "updateTestManager";
+                        }
+                    };
+
+                    return new CustomAttribute[]{testIdAttr, updateTestManagerAttr};
+                }
+            };
+        }
+    }
+
+    
 }

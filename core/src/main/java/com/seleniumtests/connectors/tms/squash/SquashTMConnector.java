@@ -140,184 +140,245 @@ public class SquashTMConnector extends TestManager {
 	}
 
 	@Override
-	public void recordResult(ITestResult testResult) {
-		
-		try {
-			SquashTMApi sapi = getApi();
-			Project project = Project.get(projectName);
-			Integer testId = getTestCaseId(testResult);
-			if (testId == null) {
-				logger.warn("Results won't be recorded, no testId configured for {}", TestNGResultUtils.getTestName(testResult));
-				return;
-			}
-			Integer datasetId = getDatasetId(testResult);
-	
-			// campaign
-			String campaignName;
-			if (TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getCampaignName() != null) {
-				campaignName = TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getCampaignName();
-			} else {
-				campaignName = "Selenium " + testResult.getTestContext().getName();
-			}
+    public void recordResult(ITestResult testResult) {
 
-			Campaign campaign;
-			if (campaignCache.containsKey(campaignName) && campaignCache.get(campaignName) != null) {
-				campaign = campaignCache.get(campaignName);
-			} else {
-				campaign = Campaign.create(project, campaignName, TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getCampaignFolderPath(), new HashMap<>());
-				campaignCache.put(campaignName, campaign);
-			}
-			
-			// iteration
-			String iterationName;
-			if (TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getIterationName() != null) {
-				iterationName = TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getIterationName();
-			} else {
-				iterationName = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getApplicationVersion();
-			}
+        try {
+            SquashTMApi sapi = getApi();
+            project = Project.get(projectName);
+            Integer testId = getTestCaseId(testResult);
+            if (testId == null) {
+                logger.warn("Results won't be recorded, no testId configured for {}", TestNGResultUtils.getTestName(testResult));
+                return;
+            }
+            Integer datasetId = getDatasetId(testResult);
 
-			Iteration iteration;
-			if (iterationCache.containsKey(iterationName) && iterationCache.get(iterationName) != null) {
-				iteration = iterationCache.get(iterationName);
-			} else {
-				iteration = Iteration.create(campaign, iterationName);
-				iterationCache.put(iterationName, iteration);
-			}
-			
-			IterationTestPlanItem tpi = iteration.addTestCase(testId, datasetId);
-			
-			
-			if (testResult.isSuccess()) {
-				sapi.setExecutionResult(tpi, TestPlanItemExecution.ExecutionStatus.SUCCESS);
-				Execution lastExecution = getLastExecution(tpi);
-                if (lastExecution != null) {
-                    for (ExecutionStep es : lastExecution.getExecutionSteps()) {
-                        es.setStatus(TestPlanItemExecution.ExecutionStatus.SUCCESS);
-                    }
-                }
-			} else if (testResult.getStatus() == 2){ // failed
-				String comment = null;
-				if (testResult.getThrowable() != null) {
-					comment = testResult.getThrowable().getMessage();
-				}
-				sapi.setExecutionResult(tpi, TestPlanItemExecution.ExecutionStatus.FAILURE, comment);
-				setExecutionStepStatus(tpi, testResult);
-			} else { // skipped or other reason
-				sapi.setExecutionResult(tpi, TestPlanItemExecution.ExecutionStatus.BLOCKED);
-			}
+            Campaign campaign = getOrCreateCampaign(testResult);
+            Iteration iteration = getOrCreateIteration(testResult, campaign);
 
-		} catch (Exception e) {
-			logger.error(String.format("Could not record result for test method %s: %s", TestNGResultUtils.getTestName(testResult), e.getMessage()));
-		}
-	}
+            IterationTestPlanItem tpi = iteration.addTestCase(testId, datasetId);
 
-	public void setExecutionStepStatus(IterationTestPlanItem tpi, ITestResult testResult) {
+            applyExecutionResult(sapi, tpi, testResult);
+
+        } catch (Exception e) {
+            logger.error(String.format("Could not record result for test method %s: %s", TestNGResultUtils.getTestName(testResult), e.getMessage()));
+        }
+    }
+
+    private Campaign getOrCreateCampaign(ITestResult testResult) {
+        String campaignName;
+        if (TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getCampaignName() != null) {
+            campaignName = TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getCampaignName();
+        } else {
+            campaignName = "Selenium " + testResult.getTestContext().getName();
+        }
+
+        Campaign campaign = campaignCache.get(campaignName);
+        if (campaign == null) {
+            campaign = Campaign.create(project, campaignName, TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getCampaignFolderPath(), new HashMap<>());
+            campaignCache.put(campaignName, campaign);
+        }
+        return campaign;
+    }
+
+    private Iteration getOrCreateIteration(ITestResult testResult, Campaign campaign) {
+        String iterationName;
+        if (TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getIterationName() != null) {
+            iterationName = TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getIterationName();
+        } else {
+            iterationName = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getApplicationVersion();
+        }
+
+        Iteration iteration = iterationCache.get(iterationName);
+        if (iteration == null) {
+            iteration = Iteration.create(campaign, iterationName);
+            iterationCache.put(iterationName, iteration);
+        }
+        return iteration;
+    }
+
+    private void applyExecutionResult(SquashTMApi sapi, IterationTestPlanItem tpi, ITestResult testResult) {
+        if (testResult.isSuccess()) {
+            recordSuccessResult(sapi, tpi);
+        } else if (testResult.getStatus() == 2) { // failed
+            sapi.setExecutionResult(tpi, TestPlanItemExecution.ExecutionStatus.FAILURE); //comment is set in setExecutionStepStatus
+            setExecutionStepStatus(tpi, testResult);
+        } else { // skipped or other reason
+            sapi.setExecutionResult(tpi, TestPlanItemExecution.ExecutionStatus.BLOCKED);
+        }
+    }
+
+    private void recordSuccessResult(SquashTMApi sapi, IterationTestPlanItem tpi) {
+        sapi.setExecutionResult(tpi, TestPlanItemExecution.ExecutionStatus.SUCCESS);
+        tpi.completeDetails();
         Execution lastExecution = getLastExecution(tpi);
         if (lastExecution != null) {
-            List<TestStep> resultTestStepList = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
-            List<ExecutionStep> squashTestStepList = lastExecution.getExecutionSteps();
-            if (!getUpdateTestManager(testResult)) {
-                for (ExecutionStep es : squashTestStepList) {
-                    es.setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED);
-                }
-                squashTestStepList.getFirst().setStatus(TestPlanItemExecution.ExecutionStatus.FAILURE);
-            } else {
-                // Match squash steps with result steps by name pattern and propagate status.
-                // On mismatch: mark as FAILURE (or BLOCKED if a previous step already failed), then block all remaining steps.
-                int maxIndex = Math.min(squashTestStepList.size(), resultTestStepList.size());
-                boolean stepKO = false;
-                int index;
-                for (index = 0; index < maxIndex; index++) {
-                    ExecutionStep squashStep = squashTestStepList.get(index);
-                    TestStep resultStep = resultTestStepList.get(index);
-
-                    if (!squashStep.getName().matches(resultStep.getId() + " - .*")) {
-                        // Name mismatch: mark as FAILURE if no prior KO, otherwise BLOCKED
-                        squashStep.setStatus(stepKO
-                                ? TestPlanItemExecution.ExecutionStatus.BLOCKED
-                                : TestPlanItemExecution.ExecutionStatus.FAILURE);
-                        break;
-                    }
-
-                    squashStep.setStatus(switch (resultStep.getStepStatus()) {
-                        case TestStep.StepStatus.FAILED -> {
-                            stepKO = true;
-                            yield TestPlanItemExecution.ExecutionStatus.FAILURE;
-                        }
-                        case TestStep.StepStatus.SUCCESS -> TestPlanItemExecution.ExecutionStatus.SUCCESS;
-                        default -> TestPlanItemExecution.ExecutionStatus.BLOCKED;
-                    });
-                }
-
-                // Block all remaining squash steps after a mismatch or when result steps are exhausted
-                for (int remaining = index < maxIndex ? index + 1 : index; remaining < squashTestStepList.size(); remaining++) {
-                    squashTestStepList.get(remaining).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED);
-                }
+            for (ExecutionStep es : lastExecution.getExecutionSteps()) {
+                es.setStatus(TestPlanItemExecution.ExecutionStatus.SUCCESS);
             }
+        }
+    }
+
+    public void setExecutionStepStatus(IterationTestPlanItem tpi, ITestResult testResult) {
+        tpi.completeDetails();
+        Execution lastExecution = getLastExecution(tpi);
+        if (lastExecution == null) {
+            return;
+        }
+
+        List<TestStep> resultTestStepList = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+        List<ExecutionStep> squashTestStepList = lastExecution.getExecutionSteps();
+
+        if (!getUpdateTestManager(testResult)) {
+            markAllStepsBlockedExceptFirstFailure(squashTestStepList);
+        } else {
+            // Match squash steps with result steps by name pattern and propagate status.
+            // On mismatch: mark as FAILURE (or BLOCKED if a previous step already failed), then block all remaining steps.
+            int maxIndex = Math.min(squashTestStepList.size(), resultTestStepList.size());
+            int index = propagateStepStatuses(squashTestStepList, resultTestStepList, testResult, maxIndex);
+
+            // Block all remaining squash steps after a mismatch or when result steps are exhausted
+            int startBlock = index < maxIndex ? index + 1 : index;
+            blockSteps(squashTestStepList, startBlock);
+        }
+    }
+
+    private void markAllStepsBlockedExceptFirstFailure(List<ExecutionStep> squashTestStepList) {
+        for (ExecutionStep es : squashTestStepList) {
+            es.setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED);
+        }
+        squashTestStepList.getFirst().setStatus(TestPlanItemExecution.ExecutionStatus.FAILURE);
+    }
+
+    private int propagateStepStatuses(List<ExecutionStep> squashTestStepList, List<TestStep> resultTestStepList, ITestResult testResult, int maxIndex) {
+        boolean stepKO = false;
+        int index;
+        for (index = 0; index < maxIndex; index++) {
+            ExecutionStep squashStep = squashTestStepList.get(index);
+            squashStep.completeDetails();
+            TestStep resultStep = resultTestStepList.get(index);
+
+            if (!stepNamesMatch(squashStep, resultStep)) {
+                handleStepNameMismatch(squashStep, stepKO, testResult);
+                break;
+            }
+
+            stepKO = applyStepStatus(squashStep, resultStep, testResult, stepKO);
+        }
+        return index;
+    }
+
+    private boolean stepNamesMatch(ExecutionStep squashStep, TestStep resultStep) {
+        return squashStep.getName().replace("<p>", "").replace("</p>", "").matches(resultStep.getId() + " - .*");
+    }
+
+    private void handleStepNameMismatch(ExecutionStep squashStep, boolean stepKO, ITestResult testResult) {
+        // Name mismatch: mark as FAILURE if no prior KO, otherwise BLOCKED
+        squashStep.setStatus(stepKO
+                ? TestPlanItemExecution.ExecutionStatus.BLOCKED
+                : TestPlanItemExecution.ExecutionStatus.FAILURE);
+        if (!stepKO) {
+            squashStep.setComment(getThrowableMessage(testResult));
+        }
+    }
+
+    private boolean applyStepStatus(ExecutionStep squashStep, TestStep resultStep, ITestResult testResult, boolean stepKO) {
+        squashStep.setStatus(switch (resultStep.getStepStatus()) {
+            case TestStep.StepStatus.FAILED -> {
+                squashStep.setComment(getThrowableMessage(testResult));
+                yield TestPlanItemExecution.ExecutionStatus.FAILURE;
+            }
+            case TestStep.StepStatus.SUCCESS -> TestPlanItemExecution.ExecutionStatus.SUCCESS;
+            default -> TestPlanItemExecution.ExecutionStatus.BLOCKED;
+        });
+        return stepKO || resultStep.getStepStatus() == TestStep.StepStatus.FAILED;
+    }
+
+    private String getThrowableMessage(ITestResult testResult) {
+        return testResult.getThrowable() != null ? testResult.getThrowable().getMessage() : null;
+    }
+
+    private void blockSteps(List<ExecutionStep> squashTestStepList, int from) {
+        for (int remaining = from; remaining < squashTestStepList.size(); remaining++) {
+            squashTestStepList.get(remaining).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED);
         }
     }
 
     public Execution getLastExecution(IterationTestPlanItem tpi) {
         List<Execution> allExe = tpi.getExecutions();
         for (Execution exe : allExe) {
-            if (Objects.equals(exe.getLastExecutedOn(), tpi.getLastExecutedBy())) {
+            if (Objects.equals(exe.getLastExecutedOn(), tpi.getLastExecutedOn())) {
+                exe.completeDetails();
                 return exe;
             }
         }
         return null;
     }
 
-	
-	@Override
+    @Override
     public void updateTestCase(ITestResult testResult) {
 
         try {
-            if (getUpdateTestManager(testResult)) {
-                SquashTMApi sapi = getApi();
-                Integer testCaseId = getTestCaseId(testResult);
-                if (testCaseId == null) {
-                    logger.warn("Test Case won't be updated, no testCaseId configured for {}", TestNGResultUtils.getTestName(testResult));
-                    return;
-                }
-
-                TestCase testCase = TestCase.get(testCaseId);
-                testCase.completeDetails();
-                Map<String, Object> testCaseUpdatedDatas = new HashMap<>();
-                testCaseUpdatedDatas.put("description", testResult.getMethod().getDescription());
-                testCase.update(testCase.getId(), testCaseUpdatedDatas);
-
-                //Delete all steps in test case
-                //get all ids
-                List<String> oldStepsIds = new ArrayList<>();
-                for (io.github.bhecquet.entities.TestStep oldTestStep : testCase.getTestSteps()) {
-                    oldStepsIds.add(String.valueOf(oldTestStep.getId()));
-                }
-                //call squash API
-                if (!oldStepsIds.isEmpty()) {
-                    io.github.bhecquet.entities.TestStep.delete(String.join(",", oldStepsIds));
-                }
-
-                List<TestStep> testStepList = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
-                for (TestStep testStep : testStepList) {
-                    if (StringUtils.isBlank(testStep.getDescription())) {
-                        continue; // skip step if description is null or blank
-                    }
-                    Map<String, Object> datas = new HashMap<>();
-                    datas.put("action", String.format("%s - %s", testStep.getId(), testStep.getDescription()));
-                    datas.put("expected_result", testStep.getExpectedResult());
-                    io.github.bhecquet.entities.TestStep newTestStep = io.github.bhecquet.entities.TestStep.create(testCase.getId(), datas);
-                    //add attachment if exists
-                    for (Snapshot snapshot : testStep.getSnapshots()) {
-                        if (snapshot.getCheckSnapshot() == SnapshotCheckType.NONE || snapshot.getCheckSnapshot() == SnapshotCheckType.FULL) {
-                            newTestStep.uploadAttachment(new File(snapshot.getScreenshot().getOutputDirectory() + "/" + snapshot.getScreenshot().getImagePath()), newTestStep.getId());
-                        }
-                    }
-                }
+            if (!getUpdateTestManager(testResult)) {
+                return;
             }
+            Integer testCaseId = getTestCaseId(testResult);
+            if (testCaseId == null) {
+                logger.warn("Test Case won't be updated, no testCaseId configured for {}", TestNGResultUtils.getTestName(testResult));
+                return;
+            }
+
+            TestCase testCase = TestCase.get(testCaseId);
+            testCase.completeDetails();
+            updateTestCaseDescription(testResult, testCase);
+            deleteExistingTestSteps(testCase);
+            createTestSteps(testResult, testCase);
+
         } catch (Exception e) {
             logger.error(String.format("Could not update Test Case for test method %s: %s", TestNGResultUtils.getTestName(testResult), e.getMessage()));
         }
-    }	
+    }
+
+    private void updateTestCaseDescription(ITestResult testResult, TestCase testCase) {
+        Map<String, Object> testCaseUpdatedDatas = new HashMap<>();
+        testCaseUpdatedDatas.put("description", testResult.getMethod().getDescription());
+        testCase.update(testCase.getId(), testCaseUpdatedDatas);
+    }
+
+    private void deleteExistingTestSteps(TestCase testCase) {
+        //Delete all steps in test case
+        //get all ids
+        List<String> oldStepsIds = new ArrayList<>();
+        for (io.github.bhecquet.entities.TestStep oldTestStep : testCase.getTestSteps()) {
+            oldStepsIds.add(String.valueOf(oldTestStep.getId()));
+        }
+        //call squash API
+        if (!oldStepsIds.isEmpty()) {
+            io.github.bhecquet.entities.TestStep.delete(String.join(",", oldStepsIds));
+        }
+    }
+
+    private void createTestSteps(ITestResult testResult, TestCase testCase) {
+        List<TestStep> testStepList = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+        for (TestStep testStep : testStepList) {
+            if (StringUtils.isBlank(testStep.getDescription())) {
+                continue; // skip step if description is null or blank
+            }
+            createTestStep(testCase, testStep);
+        }
+    }
+
+    private void createTestStep(TestCase testCase, TestStep testStep) {
+        Map<String, Object> datas = new HashMap<>();
+        datas.put("action", String.format("%s - %s", testStep.getId(), testStep.getDescription()));
+        datas.put("expected_result", testStep.getExpectedResult());
+        io.github.bhecquet.entities.TestStep newTestStep = io.github.bhecquet.entities.TestStep.create(testCase.getId(), datas);
+        //add attachment if exists
+        for (Snapshot snapshot : testStep.getSnapshots()) {
+            if (snapshot.getCheckSnapshot() == SnapshotCheckType.NONE || snapshot.getCheckSnapshot() == SnapshotCheckType.FULL) {
+                newTestStep.uploadAttachment(new File(snapshot.getScreenshot().getOutputDirectory() + "/" + snapshot.getScreenshot().getImagePath()), newTestStep.getId());
+            }
+        }
+    }
 
 	@Override
 	public void recordResultFiles(ITestResult testResult) {
