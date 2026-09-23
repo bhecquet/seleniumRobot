@@ -65,6 +65,9 @@ public class TestByC extends MockitoTest {
         mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(false)).thenReturn(eventDriver);
 
         when(driver.findElement(any(By.class))).thenReturn(elements);
+        
+        //Issue #792 : by default, consider the screen as scrollable (matches historical behavior of the android UiScrollable selector)
+        when(eventDriver.findElements(AppiumBy.androidUIAutomator("new UiSelector().scrollable(true)"))).thenReturn(List.of(element1));
     }
 
     @AfterMethod(groups = {"ut"})
@@ -403,6 +406,59 @@ public class TestByC extends MockitoTest {
         verify(driver).findElement(expectedSelector);
     }
 
+    /**
+     * Issue #792
+     * When the current screen has no scrollable widget, the generated UiAutomator selector must use
+     * 'new UiSelector().scrollable(false)' instead of 'scrollable(true)' so that Appium does not throw
+     * an exception looking for a non-existing scrollable container.
+     */
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeAndroidAppScreenNotScrollableTextAttribute() {
+        findElementByAttributeAndroidAppNotScrollable(new ByC.ByAttribute("text", "value"), AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(false).instance(0)).scrollIntoView(new UiSelector().text(\"value\").instance(0))"));
+    }
+
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeAndroidAppScreenNotScrollableDescriptionAttribute() {
+        findElementByAttributeAndroidAppNotScrollable(new ByC.ByAttribute("content-desc", "value"), AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(false).instance(0)).scrollIntoView(new UiSelector().description(\"value\").instance(0))"));
+    }
+
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeAndroidAppScreenNotScrollableResourceIdAttribute() {
+        findElementByAttributeAndroidAppNotScrollable(new ByC.ByAttribute("resource-id", "value"), AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(false).instance(0)).scrollIntoView(new UiSelector().resourceId(\"value\").instance(0))"));
+    }
+
+    @Test(groups = {"ut"})
+    public void testFindElementsByAttributeAndroidAppScreenNotScrollable() {
+        when(eventDriver.isWebTest()).thenReturn(false);
+        when(eventDriver.getOriginalDriver()).thenReturn(androidDriver);
+        when(eventDriver.findElements(AppiumBy.androidUIAutomator("new UiSelector().scrollable(true)"))).thenReturn(new ArrayList<>());
+
+        ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("text", "value"));
+        byAttribute.findElements(driver);
+        verify(driver).findElements(AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(false).instance(0)).scrollIntoView(new UiSelector().text(\"value\").instance(0))"));
+    }
+
+    @Test(groups = {"ut"})
+    public void testFindElementsByAttributeAndroidAppScreenScrollable() {
+        when(eventDriver.isWebTest()).thenReturn(false);
+        when(eventDriver.getOriginalDriver()).thenReturn(androidDriver);
+        // default stub from init() already returns a non-empty list for the scrollable(true) query
+
+        ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("text", "value"));
+        byAttribute.findElements(driver);
+        verify(driver).findElements(AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().text(\"value\").instance(0))"));
+    }
+
+    private void findElementByAttributeAndroidAppNotScrollable(ByC.ByAttribute selector, By expectedSelector) {
+        when(eventDriver.isWebTest()).thenReturn(false);
+        when(eventDriver.getOriginalDriver()).thenReturn(androidDriver);
+        // screen has no scrollable widget
+        when(eventDriver.findElements(AppiumBy.androidUIAutomator("new UiSelector().scrollable(true)"))).thenReturn(new ArrayList<>());
+
+        ByC.ByAttribute byAttribute = spy(selector);
+        byAttribute.findElement(driver);
+        verify(driver).findElement(expectedSelector);
+    }
 
 
     @Test(groups = {"ut"})

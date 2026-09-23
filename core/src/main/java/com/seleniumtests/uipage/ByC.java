@@ -641,7 +641,16 @@ public class ByC extends By {
                     return null;
                 }
             }
-            return String.format("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().%s.instance(0))", selector);
+            //Issue #792 : check if the current page/screen is scrollable before returning the selector
+            if (isScreenScrollable(WebUIDriver.getWebDriver(false))) {
+                return String.format("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().%s.instance(0))", selector);
+            } else {
+                return String.format("new UiScrollable(new UiSelector().scrollable(false).instance(0)).scrollIntoView(new UiSelector().%s.instance(0))", selector);
+            }
+        }
+
+        private boolean isScreenScrollable(SearchContext context) {
+            return !context.findElements(AppiumBy.androidUIAutomator("new UiSelector().scrollable(true)")).isEmpty();
         }
         
         @Override
