@@ -98,7 +98,7 @@ public class TestNGResultUtils {
 		setSnapshotComparisonResult(newTestResult, ITestResult.SKIP);
 		
 		// create testResult own context
-		SeleniumTestsContext newTestContext = new SeleniumTestsContext(getSeleniumRobotTestContext(toCopy), false);
+		SeleniumTestsContext newTestContext = new SeleniumTestsContext(getSeleniumRobotTestContext(toCopy), false, "TestResultCopy-" + name);
 		newTestContext.createTestSpecificOutputDirectory(newTestResult);
 		setSeleniumRobotTestContext(newTestResult, newTestContext);
 		

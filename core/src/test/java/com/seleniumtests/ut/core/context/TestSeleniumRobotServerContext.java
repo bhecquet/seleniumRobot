@@ -2,7 +2,9 @@ package com.seleniumtests.ut.core.context;
 
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.seleniumtests.util.osutility.SystemUtility;
@@ -397,6 +399,136 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+		}
+	}
+
+	/**
+	 * Check that createSeleniumRobotServer returns a connector, correctly configured (url, token, test name), when server is active, an URL is provided and server replies to isAlive()
+	 */
+	@Test(groups = "ut")
+	public void testCreateSeleniumRobotServerActiveAndAlive(final ITestContext testNGCtx) throws Exception {
+		List<Object> constructorArgs = new ArrayList<>();
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+			constructorArgs.addAll(context.arguments());
+		})) {
+			initThreadContext(testNGCtx);
+			SeleniumRobotServerContext serverContext = SeleniumTestsContextManager.getThreadContext().seleniumServer();
+			serverContext.setSeleniumRobotServerUrl("http://localhost:1234");
+			serverContext.setSeleniumRobotServerActive(true);
+			serverContext.setSeleniumRobotServerToken("myToken");
+
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			SeleniumRobotVariableServerConnector connector = serverContext.createSeleniumRobotServer(testResult);
+
+			Assert.assertNotNull(connector);
+			Assert.assertEquals(mockedVariableServerConnector.constructed().size(), 1);
+			Assert.assertEquals(constructorArgs.get(0), true);
+			Assert.assertEquals(constructorArgs.get(1), "http://localhost:1234");
+			Assert.assertEquals(constructorArgs.get(2), "myTest");
+			Assert.assertEquals(constructorArgs.get(3), "myToken");
+		}
+	}
+
+	/**
+	 * Check that when testNGResult is null, the connector is created with a null test name
+	 */
+	@Test(groups = "ut")
+	public void testCreateSeleniumRobotServerWithNullTestResult(final ITestContext testNGCtx) throws Exception {
+		List<Object> constructorArgs = new ArrayList<>();
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+			constructorArgs.addAll(context.arguments());
+		})) {
+			initThreadContext(testNGCtx);
+			SeleniumRobotServerContext serverContext = SeleniumTestsContextManager.getThreadContext().seleniumServer();
+			serverContext.setSeleniumRobotServerUrl("http://localhost:1234");
+			serverContext.setSeleniumRobotServerActive(true);
+
+			SeleniumRobotVariableServerConnector connector = serverContext.createSeleniumRobotServer(null);
+
+			Assert.assertNotNull(connector);
+			Assert.assertNull(constructorArgs.get(2));
+		}
+	}
+
+	/**
+	 * Check that a ConfigurationException is raised when the variable server cannot be contacted
+	 */
+	@Test(groups = "ut", expectedExceptions = ConfigurationException.class)
+	public void testCreateSeleniumRobotServerNotAlive(final ITestContext testNGCtx) throws Exception {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(false);
+		})) {
+			initThreadContext(testNGCtx);
+			SeleniumRobotServerContext serverContext = SeleniumTestsContextManager.getThreadContext().seleniumServer();
+			serverContext.setSeleniumRobotServerUrl("http://localhost:1234");
+			serverContext.setSeleniumRobotServerActive(true);
+
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			serverContext.createSeleniumRobotServer(testResult);
+		}
+	}
+
+	/**
+	 * Check that createSeleniumRobotServer returns null (and does not try to create any connector) when server is not active
+	 */
+	@Test(groups = "ut")
+	public void testCreateSeleniumRobotServerNotActive(final ITestContext testNGCtx) throws Exception {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class)) {
+			initThreadContext(testNGCtx);
+			SeleniumRobotServerContext serverContext = SeleniumTestsContextManager.getThreadContext().seleniumServer();
+			serverContext.setSeleniumRobotServerUrl("http://localhost:1234");
+			serverContext.setSeleniumRobotServerActive(false);
+
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			SeleniumRobotVariableServerConnector connector = serverContext.createSeleniumRobotServer(testResult);
+
+			Assert.assertNull(connector);
+			Assert.assertTrue(mockedVariableServerConnector.constructed().isEmpty());
+		}
+	}
+
+	/**
+	 * Check that createSeleniumRobotServer returns null when server is active but no URL is defined
+	 */
+	@Test(groups = "ut")
+	public void testCreateSeleniumRobotServerActiveWithoutUrl(final ITestContext testNGCtx) throws Exception {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class)) {
+			initThreadContext(testNGCtx);
+			SeleniumRobotServerContext serverContext = SeleniumTestsContextManager.getThreadContext().seleniumServer();
+
+			// set the url first, so 'setSeleniumRobotServerActive' does not raise ConfigurationException, then remove it
+			serverContext.setSeleniumRobotServerUrl("http://localhost:1234");
+			serverContext.setSeleniumRobotServerActive(true);
+			serverContext.setSeleniumRobotServerUrl(null);
+
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			SeleniumRobotVariableServerConnector connector = serverContext.createSeleniumRobotServer(testResult);
+
+			Assert.assertNull(connector);
+			Assert.assertTrue(mockedVariableServerConnector.constructed().isEmpty());
+		}
+	}
+
+	/**
+	 * Check that createSeleniumRobotServer returns null when 'active' state is not defined (null)
+	 */
+	@Test(groups = "ut")
+	public void testCreateSeleniumRobotServerActiveIsNull(final ITestContext testNGCtx) throws Exception {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class)) {
+			initThreadContext(testNGCtx);
+			SeleniumTestsContext context = SeleniumTestsContextManager.getThreadContext();
+			SeleniumRobotServerContext serverContext = context.seleniumServer();
+
+			serverContext.setSeleniumRobotServerUrl("http://localhost:1234");
+			context.setAttribute(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, null);
+
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			SeleniumRobotVariableServerConnector connector = serverContext.createSeleniumRobotServer(testResult);
+
+			Assert.assertNull(connector);
+			Assert.assertTrue(mockedVariableServerConnector.constructed().isEmpty());
 		}
 	}
 }

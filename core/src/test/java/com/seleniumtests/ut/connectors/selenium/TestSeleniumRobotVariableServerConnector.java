@@ -18,11 +18,7 @@
 package com.seleniumtests.ut.connectors.selenium;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -170,6 +166,15 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		Assert.assertEquals(connector.getEnvironmentId(), 2);
 		Assert.assertEquals((int)connector.createTestCase("Test1"), 3);
 		Assert.assertEquals(connector.getVersionId(), 4);
+	}
+
+	@Test(groups= {"ut"})
+	public void testServerActiveAndAliveWithoutTest() throws UnirestException {
+		configureMockedVariableServerConnection();
+		SeleniumRobotVariableServerConnector connector = spy(new SeleniumRobotVariableServerConnector(true, SERVER_URL, null, null));
+		Assert.assertTrue(connector.getActive());
+
+		verify(connector, never()).createTestCase(any());
 	}
 	
 	/**
@@ -790,6 +795,13 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		connector.createTestCase("foo");
 		verify(createTestCaseRequest, never()).header(eq("Authorization"), anyString());
+	}
+
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
+	public void testCreateTestCaseWithoutName() throws UnirestException {
+		configureMockedVariableServerConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		connector.createTestCase(null);
 	}
 	
 	/**

@@ -19,19 +19,21 @@ package com.seleniumtests.it.stubclasses;
 
 import java.lang.reflect.Method;
 
+import com.seleniumtests.MockitoTestListener;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.util.logging.ScenarioLogger;
 
 /* test class for showing the issue #115
  * TODO: how to create a map with parameters, which is accessible from BeforeMethod / AfterMethod
  */
+@Listeners(MockitoTestListener.class)
 public class StubTestClassForDataProvider extends StubParentClass {
 
 	@Test(groups={"stub"}, dataProvider = "data")
@@ -39,7 +41,7 @@ public class StubTestClassForDataProvider extends StubParentClass {
 		
 		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getAttribute("data"));
 		SeleniumTestsContextManager.getThreadContext().setAttribute("data", data);
-		((ScenarioLogger)logger).log("data written: " + SeleniumTestsContextManager.getThreadContext().getAttribute("data"));
+		logger.log("data written: " + SeleniumTestsContextManager.getThreadContext().getAttribute("data"));
 	}
 
 	@Test(groups={"stub"}, dataProvider = "dataParallel")
@@ -48,6 +50,11 @@ public class StubTestClassForDataProvider extends StubParentClass {
 		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getAttribute("data"));
 		SeleniumTestsContextManager.getThreadContext().setAttribute("data", data);
 		logger.log("data written: " + SeleniumTestsContextManager.getThreadContext().getAttribute("data"));
+	}
+
+	@Test(groups={"stub"}, dataProvider = "dataWithTestVariable")
+	public void testMethodWithVariable(String data) {
+		logger.log(String.format("method param: %s - variable value: %s ", data, param("key-3")));
 	}
 	
 	@BeforeMethod(groups={"stub"})
@@ -58,6 +65,12 @@ public class StubTestClassForDataProvider extends StubParentClass {
 	@DataProvider
 	public Object[][] data(ITestContext testContext) {
 		return new String[][] {new String[] {"data1"}, new String[] {"data2"}, new String[] {"data3"}};
+	}
+
+	@DataProvider
+	public Object[][] dataWithTestVariable(ITestContext testContext) {
+
+		return new String[][] {new String[] {param("key-1")}, new String[] {param("key-2")}};
 	}
 
 	@DataProvider(parallel = true)

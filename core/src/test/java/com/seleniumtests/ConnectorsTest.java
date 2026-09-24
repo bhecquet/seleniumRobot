@@ -765,7 +765,7 @@ public class ConnectorsTest extends MockitoTest {
 	/**
 	 * simulate an alive variable sever responding to all requests
 	 */
-	protected void configureMockedVariableServerConnection() throws UnirestException {
+    public void configureMockedVariableServerConnection() throws UnirestException {
 		configureMockedVariableServerConnection(SERVER_URL);
 	}
 	protected void configureMockedVariableServerConnection(String serverUrl) throws UnirestException {

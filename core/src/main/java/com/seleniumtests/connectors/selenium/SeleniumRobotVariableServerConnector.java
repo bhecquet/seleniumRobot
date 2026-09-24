@@ -70,7 +70,10 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 		
 		if (active) {
 			getInfoFromServer();
-			testCaseId = createTestCase(testName);
+
+			if (testName != null) {
+				testCaseId = createTestCase(testName);
+			}
 		}
 	}
 	
@@ -171,11 +174,13 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 			GetRequest request = buildGetRequest(url + VARIABLE_API_URL)
 					.queryString(FIELD_VERSION, versionId)
 					.queryString(FIELD_ENVIRONMENT, environmentId)
-					.queryString(FIELD_TEST, testCaseId)
 					.queryString(FIELD_OLDER_THAN, variablesOlderThanDays)
 					.queryString("reserve", reserve)
 					.queryString("format", "json");
 
+			if (testCaseId != null) {
+				request = request.queryString(FIELD_TEST, testCaseId);
+			}
 			if (variablesReservationDuration > 0) {
 				request = request.queryString("reservationDuration", variablesReservationDuration * 60);
 			}

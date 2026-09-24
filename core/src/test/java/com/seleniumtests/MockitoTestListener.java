@@ -1,9 +1,7 @@
 package com.seleniumtests;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.video.VideoCaptureMode;
-import org.htmlunit.xpath.operations.Bool;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
 import org.testng.ITestContext;
@@ -12,6 +10,10 @@ import org.testng.ITestResult;
 
 import java.lang.reflect.Method;
 
+/**
+ * This listener allows to use mocks in multithreads tests
+ * For example, when we need to use a seleniumRobot-server mock from multi-thread test
+ */
 public class MockitoTestListener implements ITestListener, IInvokedMethodListener {
 
     private static ThreadLocal<Boolean> mocksInitialized = new ThreadLocal<>();
@@ -21,6 +23,11 @@ public class MockitoTestListener implements ITestListener, IInvokedMethodListene
         if (System.getProperty("mockTestExecutionMethod") != null && mocksInitialized.get() == null) {
             initMocks();
         }
+    }
+
+
+    private static void closeMocks() {
+
     }
 
     private static void initMocks() {

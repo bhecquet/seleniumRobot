@@ -73,11 +73,7 @@ public class SeleniumRobotServerContext {
 
     // TODO: this call should be moved into postInit method as SeleniumRobotVariableServerConnector calls SeleniumTestsContextManager.getThreadContext() which may not be initialized
     public SeleniumRobotVariableServerConnector createSeleniumRobotServer(ITestResult testNGResult) {
-    	
-    	if (testNGResult == null) {
-    		return null;
-    	}
-    	
+
     	// in case we find the url of variable server and it's marked as active, use it
 		if (getSeleniumRobotServerActive() != null 
 				&& getSeleniumRobotServerActive() 
@@ -88,7 +84,8 @@ public class SeleniumRobotServerContext {
 							getSeleniumRobotServerUrl(),
 							SELENIUMROBOTSERVER_URL);
 			}
-			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getSeleniumRobotServerActive(), getSeleniumRobotServerUrl(), TestNGResultUtils.getTestName(testNGResult).replaceAll("^before-", ""), getSeleniumRobotServerToken());
+			String testName = testNGResult != null ? TestNGResultUtils.getTestName(testNGResult).replaceAll("^before-", "") : null;
+			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getSeleniumRobotServerActive(), getSeleniumRobotServerUrl(), testName, getSeleniumRobotServerToken());
 			
 			if (!vServer.isAlive()) {
 				throw new ConfigurationException(String.format("Variable server %s could not be contacted", getSeleniumRobotServerUrl()));

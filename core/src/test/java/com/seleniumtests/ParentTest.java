@@ -1,5 +1,6 @@
 package com.seleniumtests;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 import org.apache.commons.io.FileUtils;
@@ -19,6 +20,7 @@ public class ParentTest {
         System.clearProperty("applicationName");
         resetTestNGResultAndLogger();
         OSUtility.resetInstalledBrowsersWithVersion();
+        SeleniumTestsContextManager.clearContextHistory();
 
         File outputDirectory = new File(testContext.getOutputDirectory()).getParentFile();
         if ("true".equals(System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION))) {

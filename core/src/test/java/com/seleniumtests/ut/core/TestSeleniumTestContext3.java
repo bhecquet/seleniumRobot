@@ -309,10 +309,55 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 			// only one call, done by first context init, further retrieving is forbidden
 			verify(seleniumTestsCtx.getVariableServer()).getVariables(0, -1);
 			verify(seleniumTestsCtx2.getVariableServer(), never()).getVariables(0, -1);
+			Assert.assertNotNull(seleniumTestsCtx2.getVariableAlreadyRequestedFromServer());
 
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+
+	/**
+	 * Check that it's possible to initialize a context even if testng result is not present
+	 * Some tasks will be ignored
+	 */
+	@Test(groups = { "ut" })
+	public void testConfigureContextWithoutTestNGResult(final ITestContext testNGCtx)
+			throws Exception {
+
+		Map<String, TestVariable> variables = new HashMap<>();
+		variables.put("key", new TestVariable("key", "val1"));
+
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
+			when(variableServerMock.isAlive()).thenReturn(true);
+			when(variableServerMock.getVariables(0, -1)).thenReturn(variables);
+		})){
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
+
+
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+
+			SeleniumTestsContextManager.initThreadContext();
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+
+			// check that variables are kept even if variable server has not been re-called
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key").getValue(), "val1");
+
+			// only one call, done by first context init, further retrieving is forbidden
+			verify(seleniumTestsCtx.getVariableServer()).getVariables(0, -1);
+
+			// variables are not stored for re-use because they have been retrieved without a test
+			Assert.assertNull(seleniumTestsCtx.getVariableAlreadyRequestedFromServer());
+			Assert.assertNull(seleniumTestsCtx.getTestNGResult());
+			Assert.assertEquals(seleniumTestsCtx.getOutputDirectory(), SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
 		}
 	}
 

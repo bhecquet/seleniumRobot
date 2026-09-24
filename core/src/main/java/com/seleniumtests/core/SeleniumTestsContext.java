@@ -77,6 +77,9 @@ public class SeleniumTestsContext {
 	private static final Map<String, String> outputFolderNames = Collections.synchronizedMap(new HashMap<>());
     private static final UUID contextId = UUID.randomUUID();
 
+    // origin used when none is provided, kept for backward compatibility with constructors that do not specify it
+    public static final String UNKNOWN_ORIGIN = "Unknown";
+
     /* configuration defined in testng.xml */
     public static final String LOAD_INI = "loadIni";							// comma separated list of files to load. They are searched in data/<app>/config folder. They will append to env.ini file with variable overwriting. Last file will overwrite previous ones
     public static final String STARTED_BY = "startedBy";						// any string saying who started the test. It may be a URL where to find result, for reports in bugtrackers
@@ -281,12 +284,22 @@ public class SeleniumTestsContext {
     private SeleniumRobotServerContext seleniumRobotServerContext;
     private TestStepManager testStepManager; // handles logging of test steps in this context
     private boolean driverCreationBlocked = false;		// if true, inside this thread, driver creation will be forbidden
+
+    private String origin; // who created this context (e.g: "ConfigurationMethod-BeforeMethod", "TestMethod-<testName>", ...), for traceability purpose
     
     // folder config
  	private Map<String, HashMap<String,String>> idMapping;
     
     public SeleniumTestsContext() {
+    	this(UNKNOWN_ORIGIN);
+    }
+    
+    /**
+     * @param origin	who created this context (e.g: "ConfigurationMethod-BeforeMethod", "TestMethod-<testName>", ...)
+     */
+    public SeleniumTestsContext(String origin) {
     	// for test purpose only
+    	this.origin = origin;
     	variableServer = null;
     	seleniumGridConnector = null;
     	seleniumGridConnectors = new ArrayList<>();
@@ -294,6 +307,7 @@ public class SeleniumTestsContext {
     	bugtrackerInstance = null;
     	testManagerContext = null;
     	testStepManager = new TestStepManager();
+    	registerContext();
     }
     
     /**
@@ -310,6 +324,17 @@ public class SeleniumTestsContext {
      * @param allowRequestsToDependencies		if true, we will request to variable server / grid hub for new session or data		
      */
     public SeleniumTestsContext(SeleniumTestsContext toCopy, boolean allowRequestsToDependencies) {
+    	this(toCopy, allowRequestsToDependencies, "CopyOf-" + (toCopy.origin != null ? toCopy.origin : UNKNOWN_ORIGIN));
+    }
+    
+    /**
+     * 
+     * @param toCopy							source context from which we copy data
+     * @param allowRequestsToDependencies		if true, we will request to variable server / grid hub for new session or data
+     * @param origin							who created this context (e.g: "ConfigurationMethod-BeforeMethod", "TestMethod-<testName>", ...)
+     */
+    public SeleniumTestsContext(SeleniumTestsContext toCopy, boolean allowRequestsToDependencies, String origin) {
+    	this.origin = origin;
     	contextDataMap = new HashMap<>(toCopy.contextDataMap);
     	fullContextDataMapAsTestVariables = new HashMap<>(toCopy.fullContextDataMapAsTestVariables);
     	testNGContext = toCopy.testNGContext;
@@ -334,6 +359,7 @@ public class SeleniumTestsContext {
     	testStepManager = new TestStepManager(toCopy.testStepManager);
     	
     	initSubContexts();
+    	registerContext();
     }
     
     private void initSubContexts() {
@@ -342,7 +368,23 @@ public class SeleniumTestsContext {
     	seleniumRobotServerContext = new SeleniumRobotServerContext(this);
     }
     
+    /**
+     * Registers this context instance into the global context history (held by SeleniumTestsContextManager), along with its origin, for traceability purpose
+     */
+    private void registerContext() {
+    	SeleniumTestsContextManager.registerContext(origin, this);
+    }
+    
     public SeleniumTestsContext(final ITestContext context) {
+    	this(context, UNKNOWN_ORIGIN);
+    }
+    
+    /**
+     * @param context	TestNG context
+     * @param origin	who created this context (e.g: "GlobalContext", "ConfigurationMethod-BeforeTest", ...)
+     */
+    public SeleniumTestsContext(final ITestContext context, String origin) {
+        this.origin = origin;
         testNGContext = context;
 
     	testStepManager = new TestStepManager();
@@ -350,6 +392,14 @@ public class SeleniumTestsContext {
     	initSubContexts();
     	
         buildContextFromConfig();
+        registerContext();
+    }
+    
+    /**
+     * Who created this context (e.g: "ConfigurationMethod-BeforeMethod", "TestMethod-<testName>", ...)
+     */
+    public String getOrigin() {
+    	return origin;
     }
     
     private void buildContextFromConfig() {
@@ -810,6 +860,8 @@ public class SeleniumTestsContext {
     /**
      * post configuration of the context
      * This should be done only inside the test method as we need the 'Test' method result and not an 'Before' or 'After' method result
+     * If testNGResult is null, we are outside a test, so many operations are useless, only getting variable is really important
+     * @param testNGResult      the testNGResult. This may be null in case of a DataProvider (as we are out of any test)
      */
     public void configureContext(ITestResult testNGResult) {
     	
@@ -817,39 +869,50 @@ public class SeleniumTestsContext {
     	this.testNGResult = testNGResult; 
     	
     	// context may be missing from testNgResult, so add it to avoid problems when getting hash for test
-    	if (testNGResult.getTestContext() == null) {
+    	if (testNGResult != null && testNGResult.getTestContext() == null) {
     		((TestResult)testNGResult).setContext(testNGContext);
     	}
 
-        updateTestAndMobile(getPlatform());
-        
-        // update browser version: replace installed one with those given in parameters
-        updateInstalledBrowsers();
-        
-        // update output directory
-        createTestSpecificOutputDirectory(testNGResult);
+        if (testNGResult != null) {
+
+            updateTestAndMobile(getPlatform());
+
+            // update browser version: replace installed one with those given in parameters
+            updateInstalledBrowsers();
+
+            // update output directory
+            createTestSpecificOutputDirectory(testNGResult);
+        }
         
         // create seleniumRobot server instance
         variableServer = seleniumRobotServerContext.createSeleniumRobotServer(testNGResult);
     	
         // read and set test configuration from env.ini file and from seleniumRobot server
 		try {
-			testNGResult.setAttribute("hasVariableServerFailed", false);
+            if (testNGResult != null) {
+			    testNGResult.setAttribute("hasVariableServerFailed", false);
+            }
 			setTestConfiguration();
 		} catch (Exception e) {
 
 			// If the setTestConfiguration fails, it's probably an error from the SeleniumRobot Server
 			// In this case, add a flag to ensure that the test won't be executed but the Exception is displayed in the report
-			testNGResult.setThrowable(new SeleniumRobotServerException("An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.", e));
-			testNGResult.setAttribute("hasVariableServerFailed", true);
+			if (testNGResult != null) {
+                testNGResult.setThrowable(new SeleniumRobotServerException("An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.", e));
+                testNGResult.setAttribute("hasVariableServerFailed", true);
 
-            // fill the variable map with something so that we look for variables only once
-            variableAlreadyRequestedFromServer = Map.of("ERROR", new TestVariable("ERROR", e.getMessage()));
+                // fill the variable map with something so that we look for variables only once
+                variableAlreadyRequestedFromServer = Map.of("ERROR", new TestVariable("ERROR", e.getMessage()));
+            }
 		}
-    	updateProxyConfig();
-    	
-    	// create other connectors that may use variables
-    	createContextConnectors();
+
+        // following action are only usefull inside a test
+        if (testNGResult != null) {
+            updateProxyConfig();
+
+            // create other connectors that may use variables
+            createContextConnectors();
+        }
     }
     
     /**
@@ -940,10 +1003,16 @@ public class SeleniumTestsContext {
     	if (variableServer != null) {
     		
     		// get variable from server if they have never been get
+            Map<String, TestVariable> variablesFromServer = variableAlreadyRequestedFromServer;
     		if (variableAlreadyRequestedFromServer == null) {
-				variableAlreadyRequestedFromServer = variableServer.getVariables(seleniumRobotServerContext.getSeleniumRobotServerVariableOlderThan(), seleniumRobotServerContext.getSeleniumRobotServerVariableReservationDuration());
+                variablesFromServer = variableServer.getVariables(seleniumRobotServerContext.getSeleniumRobotServerVariableOlderThan(), seleniumRobotServerContext.getSeleniumRobotServerVariableReservationDuration());
+
+                // when we are out of a test, do not store the variables, as they are not specific to test
+                if (testNGResult != null) {
+                    variableAlreadyRequestedFromServer = variablesFromServer;
+                }
     		}
-    		getConfiguration().putAll(variableAlreadyRequestedFromServer);
+    		getConfiguration().putAll(variablesFromServer);
 
 			// give priority to command line parameters over those from server, so overwrite variable server if overlapping
 			getConfiguration().putAll(getUserDefinedVariablesFromCommandLine());
@@ -2366,6 +2435,10 @@ public class SeleniumTestsContext {
      */
     public void resetVariableAlreadyRequestedFromServer() {
         variableAlreadyRequestedFromServer = null;
+    }
+
+    public Map<String, TestVariable> getVariableAlreadyRequestedFromServer() {
+        return variableAlreadyRequestedFromServer;
     }
 
 

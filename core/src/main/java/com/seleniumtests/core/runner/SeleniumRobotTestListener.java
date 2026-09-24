@@ -281,9 +281,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	@Override
 	public void beforeDataProviderExecution(IDataProviderMethod dataProviderMethod, ITestNGMethod method, ITestContext context) {
 
+
 		// in case dataprovider is executed in parallel with other tests, there is no guarantee that the thread executing the dataprovider has a thread context initialized
 		try {
-			SeleniumTestsContextManager.getThreadContext();
+			SeleniumTestsContext seleniumTestsContext = SeleniumTestsContextManager.getThreadContext();
+			seleniumTestsContext.configureContext(null);
 		} catch (ConfigurationException e) {
 			SeleniumTestsContextManager.initThreadContext();
 		}

@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -95,6 +96,53 @@ public class SeleniumTestsContextManager {
     // relationship between a ITestResult and its context so that we have a location where to search
     private static final Map<ITestResult, SeleniumTestsContext> testResultContext = Collections.synchronizedMap(new LinkedHashMap<>());
 
+    // keeps track of every SeleniumTestsContext instance created, along with information about who created it (e.g: "ConfigurationMethod-BeforeMethod", "TestMethod-<testName>", ...)
+    // this is only used for traceability / debugging purpose
+    private static final List<ContextCreationInfo> contextHistory = Collections.synchronizedList(new ArrayList<>());
+
+    /**
+     * Holds information about the creation of a SeleniumTestsContext instance: who created it (origin) and when
+     */
+    public static class ContextCreationInfo {
+    	private final String origin;
+    	private final Date creationDate;
+    	private final String contextString;
+
+    	public ContextCreationInfo(String origin, SeleniumTestsContext context) {
+    		this.origin = origin;
+    		this.creationDate = new Date();
+            this.contextString = context.toString();
+    	}
+
+    	@Override
+    	public String toString() {
+    		return String.format("[%s] context created by: %s", creationDate, origin);
+    	}
+    }
+
+    /**
+     * Registers a SeleniumTestsContext instance into the global context history, along with its origin, for traceability purpose
+     * @param origin	who created this context (e.g: "ConfigurationMethod-BeforeMethod", "TestMethod-<testName>", ...)
+     * @param context	the context instance that has just been created
+     */
+    static void registerContext(String origin, SeleniumTestsContext context) {
+    	contextHistory.add(new ContextCreationInfo(origin, context));
+    }
+
+    /**
+     * Returns the history of all SeleniumTestsContext instances created since the beginning of the JVM execution, along with their origin
+     */
+    public static List<ContextCreationInfo> getContextHistory() {
+    	return new ArrayList<>(contextHistory);
+    }
+
+    /**
+     * For tests only
+     */
+    public static void clearContextHistory() {
+    	contextHistory.clear();
+    }
+
     private SeleniumTestsContextManager() {
 		// As a utility class, it is not meant to be instantiated.
 	}
@@ -125,7 +173,7 @@ public class SeleniumTestsContextManager {
         }
     	
     	ITestContext testNGCtx = new DefaultTestNGContext(suiteContext);
-        globalContext = new SeleniumTestsContext(testNGCtx);
+        globalContext = new SeleniumTestsContext(testNGCtx, "GlobalContext");
     }
     
     public static void initGlobalContext(ITestContext testNGCtx) {
@@ -135,7 +183,7 @@ public class SeleniumTestsContextManager {
         	generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
         }
     	
-        globalContext = new SeleniumTestsContext(testNGCtx);
+        globalContext = new SeleniumTestsContext(testNGCtx, "GlobalContext");
     }
     
     private static String getKeyForMethod(ITestContext testNGCtx, String className, String methodName) {
@@ -154,7 +202,7 @@ public class SeleniumTestsContextManager {
     }
     
     private static SeleniumTestsContext storeTestContext(ITestContext testNGCtx) {
-    	SeleniumTestsContext tstContext = getOrCreateContext(testNGCtx, null, null, true);
+    	SeleniumTestsContext tstContext = getOrCreateContext(testNGCtx, null, null, true, "ConfigurationMethod-BeforeTest");
     	setTestContext(testNGCtx, tstContext);
     	return tstContext;
     }
@@ -170,12 +218,12 @@ public class SeleniumTestsContextManager {
      * @param testNGCtx	TestNG context
      */
     private static SeleniumTestsContext getTestContext(ITestContext testNGCtx) {
-    	return getOrCreateContext(testNGCtx, null, null, false);
+    	return getOrCreateContext(testNGCtx, null, null, false, "ConfigurationMethod-AfterTest");
     }
     
     private static SeleniumTestsContext storeClassContext(ITestContext testNGCtx, String className) {
     	// unicity is on test + class because a class could be executed by 2 tests at the same time (e.g: ParallelMode.TESTS)
-    	SeleniumTestsContext clsContext = getOrCreateContext(testNGCtx, className, null, true);
+    	SeleniumTestsContext clsContext = getOrCreateContext(testNGCtx, className, null, true, "ConfigurationMethod-BeforeClass-" + className);
     	setClassContext(testNGCtx, className, clsContext);
     	return clsContext;
     }
@@ -190,11 +238,11 @@ public class SeleniumTestsContextManager {
      * @param className	class where test execute
      */
     private static SeleniumTestsContext getClassContext(ITestContext testNGCtx, String className) {
-    	return getOrCreateContext(testNGCtx, className, null, false);
+    	return getOrCreateContext(testNGCtx, className, null, false, "ConfigurationMethod-AfterClass-" + className);
     }
     private static SeleniumTestsContext storeMethodContext(ITestContext testNGCtx, String className, String methodName) {
     	// unicity is on test + class + method + thread because the same method name may exist in several classes or 2 testNG tests could execute the same test methods
-    	SeleniumTestsContext mtdContext = getMethodContext(testNGCtx, className, methodName, true);
+    	SeleniumTestsContext mtdContext = getMethodContext(testNGCtx, className, methodName, true, "ConfigurationMethod-BeforeMethod-" + className + "." + methodName);
     	setMethodContext(testNGCtx, className, methodName, mtdContext);
     	return mtdContext;
     }
@@ -203,7 +251,11 @@ public class SeleniumTestsContextManager {
     }
     
     private static SeleniumTestsContext getMethodContext(ITestContext testNGCtx, String className, String methodName, boolean createCopy) {
-    	return getOrCreateContext(testNGCtx, className, methodName, createCopy);
+    	return getOrCreateContext(testNGCtx, className, methodName, createCopy, "TestMethod-" + className + "." + methodName);
+    }
+    
+    private static SeleniumTestsContext getMethodContext(ITestContext testNGCtx, String className, String methodName, boolean createCopy, String origin) {
+    	return getOrCreateContext(testNGCtx, className, methodName, createCopy, origin);
     }
     
 
@@ -215,8 +267,9 @@ public class SeleniumTestsContextManager {
      * @param className			class name. May be null and in this case, search only by testNGCtx
      * @param methodName		method name. May be null and in this case, search by class name and testNGCtx
      * @param createCopy		if true and we find class or test context, returns a copy
+     * @param origin			who is requesting this context (e.g: "ConfigurationMethod-BeforeMethod-<className>.<methodName>", "TestMethod-<className>.<methodName>", ...). Used only when a new context has to be created / copied
      */
-    private static SeleniumTestsContext getOrCreateContext(ITestContext testNGCtx, String className, String methodName, boolean createCopy) {
+    private static SeleniumTestsContext getOrCreateContext(ITestContext testNGCtx, String className, String methodName, boolean createCopy, String origin) {
     	
     	// unicity is on test + class + method + thread because the same method name may exist in several classes or 2 testNG tests could execute the same test methods
     	String keyMethod = getKeyForMethod(testNGCtx, className, methodName);
@@ -228,17 +281,17 @@ public class SeleniumTestsContextManager {
     	} else if (keyClass != null && classContext.get(keyClass) != null) {
     		// we need a copy of class context when we search a method context but cannot find one. So we copy it from class context
     		return (createCopy && keyMethod != null) ? 
-    				new SeleniumTestsContext(classContext.get(keyClass)): 
+    				new SeleniumTestsContext(classContext.get(keyClass), true, origin): 
     				classContext.get(keyClass);
     				
     	} else if (testNGCtx != null && testContext.get(testNGCtx.getName()) != null) {
     		// we need a copy of test context when we search for method or class context but cannot find any of them. So we copy it from text context
     		return (createCopy && (keyMethod != null || keyClass != null)) ? 
-    				new SeleniumTestsContext(testContext.get(testNGCtx.getName())): 
+    				new SeleniumTestsContext(testContext.get(testNGCtx.getName()), true, origin): 
     				testContext.get(testNGCtx.getName());
     				
     	} else {
-    		return new SeleniumTestsContext(testNGCtx);
+    		return new SeleniumTestsContext(testNGCtx, origin);
     	}
     }
     
@@ -359,7 +412,8 @@ public class SeleniumTestsContextManager {
 			currentContext = new SeleniumTestsContext(getMethodContext(context, 
 					className, 
 					methodName, 
-					true), false);
+					true,
+					"TestMethod-" + methodName), false, "TestMethod-" + methodName);
 			
 			// allow driver to be created		
 			currentContext.setDriverCreationBlocked(false);
@@ -401,14 +455,13 @@ public class SeleniumTestsContextManager {
 
     public static void initThreadContext(ITestContext testNGCtx, ITestResult testResult) {
 
-    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(testNGCtx);
+    	String origin = testResult != null ? "InitThreadContext-" + TestNGResultUtils.getTestName(testResult) : "InitThreadContext";
+    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(testNGCtx, origin);
         
         threadLocalContext.set(seleniumTestsCtx);
         
         // update some values after init. These init call the thread context previously created
-        if (testResult != null) {
-        	seleniumTestsCtx.configureContext(testResult);
-        }
+		seleniumTestsCtx.configureContext(testResult);
     }
     
     /**
@@ -508,7 +561,7 @@ public class SeleniumTestsContextManager {
     		return TestNGResultUtils.getSeleniumRobotTestContext(testResult);
     	} else {
     		logger.error("Result did not contain thread context, initializing a new one");
-        	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(testNGCtx);
+        	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(testNGCtx, "MissingContextFallback-" + TestNGResultUtils.getTestName(testResult));
             seleniumTestsCtx.configureContext(testResult);
 
             TestNGResultUtils.setSeleniumRobotTestContext(testResult, seleniumTestsCtx);

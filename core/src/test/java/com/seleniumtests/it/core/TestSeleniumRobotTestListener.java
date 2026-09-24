@@ -25,19 +25,20 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 
+import com.seleniumtests.ConnectorsTest;
+import kong.unirest.core.GetRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
+import org.mockito.MockitoAnnotations;
+import org.mockito.exceptions.base.MockitoException;
 import org.testng.Assert;
 import org.testng.TestNG;
 import org.testng.annotations.Test;
@@ -309,7 +310,66 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		 
 
 	}
-	
+
+
+	/**
+	 * This method is used by testContextWithDataProviderGettingVariablesFromServer so that we can initialize mocks on the test threads
+	 * Mockito only mocks the current thread. This callback will be called on 'testImageDetection' test start
+	 */
+	public void initMockForSeleniumServerMultithread() {
+
+		MockitoAnnotations.initMocks(this);
+		ConnectorsTest ct = new ConnectorsTest();
+		try {
+			ct.initMocks(null, null, null);
+			ct.configureMockedVariableServerConnection();
+			ct.createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200,
+					List.of(
+					"[{'id': 1, 'name': 'key-1', 'value': 'value-1', 'uploadFile': null, 'reservable': false}, {'id': 2, 'name': 'key-2', 'value': 'value-2', 'reservable': true}]", // for call in dataprovider
+					"[{'id': 3, 'name': 'key-3', 'value': 'value-3', 'uploadFile': null, 'reservable': false}, {'id': 4, 'name': 'key-4', 'value': 'value-4', 'reservable': true}]"), // for calls in tests
+			"request"
+					);
+
+
+		} catch (MockitoException e) {
+			logger.info("Mocks already initialized for this thread");
+		}
+	}
+
+	/**
+	 * Check it's possible to get variables from server even in a data provider (no test has started)
+	 */
+	@Test(groups={"it"})
+	public void testContextWithDataProviderGettingVariablesFromServer() throws Exception {
+		try {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty("mockTestExecutionMethod", "com.seleniumtests.it.core.TestSeleniumRobotTestListener#initMockForSeleniumServerMultithread");
+
+			configureMockedVariableServerConnection();
+			createServerMock(serverUrl, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200,
+					List.of(
+							"[{'id': 1, 'name': 'key-1', 'value': 'value-1', 'uploadFile': null, 'reservable': false}, {'id': 2, 'name': 'key-2', 'value': 'value-2', 'reservable': true}]", // for call in dataprovider
+							"[{'id': 3, 'name': 'key-3', 'value': 'value-3', 'uploadFile': null, 'reservable': false}, {'id': 4, 'name': 'key-4', 'value': 'value-4', 'reservable': true}]"), // for calls in tests
+					"request"
+			);
+
+			executeSubTest(5, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDataProvider.testMethodWithVariable"}, "", "");
+
+			String logs = readSeleniumRobotLogFile();
+			Assert.assertEquals(StringUtils.countMatches(logs, "Test is OK"), 2);
+
+			// Check that data retrieved by data provider and test are not the same, which means server has been called for each test
+			Assert.assertTrue(logs.contains("ScenarioLogger: method param: value-1 - variable value: value-3"));
+			Assert.assertTrue(logs.contains("ScenarioLogger: method param: value-2 - variable value: value-3"));
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty("mockTestExecutionMethod");
+		}
+
+	}
+
 	/**
 	 * Checks that with a data provider, test context does not overlap between test methods and that displayed logs correspond to the method execution and not all method executions
 	 */
