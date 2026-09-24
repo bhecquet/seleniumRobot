@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.seleniumtests.util.osutility.SystemUtility;
 import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -69,7 +70,9 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 	}
 	@Test(groups="ut context")
 	public void testSeleniumRobotServerTokenFromEnvVar(final ITestContext testNGCtx) {
-		try {
+		try (MockedStatic<SystemUtility> mockedSystemUtility = mockStatic(SystemUtility.class))
+		{
+			mockedSystemUtility.when(() -> SystemUtility.getenv(SeleniumRobotServerContext.SELENIUMROBOTSERVER_TOKEN_ENV_VAR)).thenReturn("456");
 			SystemUtility.setenv(SeleniumRobotServerContext.SELENIUMROBOTSERVER_TOKEN_ENV_VAR, "456");
 			initThreadContext(testNGCtx);
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken(), "456");
@@ -80,7 +83,9 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 	@Test(groups="ut context")
 	public void testSeleniumRobotServerTokenFromEnvVarPriority(final ITestContext testNGCtx) {
 
-		try {
+		try (MockedStatic<SystemUtility> mockedSystemUtility = mockStatic(SystemUtility.class))
+		{
+			mockedSystemUtility.when(() -> SystemUtility.getenv(SeleniumRobotServerContext.SELENIUMROBOTSERVER_TOKEN_ENV_VAR)).thenReturn("456");
 			System.setProperty("seleniumRobotServerToken", "123");
 			SystemUtility.setenv(SeleniumRobotServerContext.SELENIUMROBOTSERVER_TOKEN_ENV_VAR, "456");
 			initThreadContext(testNGCtx);
@@ -360,6 +365,8 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_VARIABLES_RESERVATION, "10");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, "7");
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
+			configureMockedVariableServerConnection("http://localhost:1234");
 			initThreadContext(testNGCtx);
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerUrl(), "http://localhost:1234");
 			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerActive());
@@ -378,6 +385,7 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_VARIABLES_RESERVATION);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN);
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
 		}
 	}
 
@@ -391,6 +399,7 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			configureMockedVariableServerConnection("http://localhost:1234");
 			initThreadContext(testNGCtx);
 			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerActive());
 			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshot());
