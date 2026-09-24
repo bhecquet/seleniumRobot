@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,13 @@ public class ExcelHelper {
 	
 
     private File excelFile;
-	
+
+    /**
+     * Create the ExcelHelper
+     * Be careful that data returned by this helper will be the same as Excel present it
+     * So if a cell contains '12.3415' but excel is told to format number with only 2 decimals, you will get 12.34
+     * @param excelFile
+     */
 	public ExcelHelper(File excelFile) {
         this.excelFile = excelFile;
     }
@@ -140,7 +145,7 @@ public class ExcelHelper {
     /**
      * Read a sheet by index in the excel file
      * @param fis
-     * @param sheetName
+     * @param sheetIndex
      * @return
      * @throws IOException
      */
