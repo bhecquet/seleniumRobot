@@ -417,7 +417,7 @@ public class TestTasks {
     		return null;
     	}
     	Object value = variable.getValue();
-        if (returnType.isAssignableFrom(value.getClass())) {
+        if (value != null && returnType.isAssignableFrom(value.getClass())) {
             return (T) value;
         }
         throw new ConfigurationException(String.format("Variable '%s' value is not of type %s", key, returnType.getName()));
@@ -438,11 +438,11 @@ public class TestTasks {
     				valuePattern == null ? "null": valuePattern.pattern()));
     		return null;
     	}
-    	Object value = matchingVariables.get(0).getValue();
-        if (returnType.isAssignableFrom(value.getClass())) {
+    	Object value = matchingVariables.getFirst().getValue();
+        if (value != null && returnType.isAssignableFrom(value.getClass())) {
             return (T) value;
         }
-        throw new ConfigurationException(String.format("Variable '%s' value is not of type %s", matchingVariables.get(0).getName(), returnType.getName()));
+        throw new ConfigurationException(String.format("Variable '%s' value is not of type %s", matchingVariables.getFirst().getName(), returnType.getName()));
     }
    
     public static void terminateCurrentStep() {
