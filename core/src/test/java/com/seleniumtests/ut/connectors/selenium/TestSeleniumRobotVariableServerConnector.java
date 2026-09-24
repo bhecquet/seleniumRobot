@@ -475,9 +475,9 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		
 		Assert.assertEquals(variable.getValue(), "value");
 
-		// check value is sent, and fileUpload set to null
+		// check value is sent, and uploadFile set to null
 		verify(updateVariableRequestWithFile).field("value", "value");
-		verify(updateVariableRequestWithFile).field("fileUpload", (File)null);
+		verify(updateVariableRequestWithFile).field("uploadFile", (File)null);
 	}
 
 	@Test(groups= {"ut"})
@@ -497,9 +497,9 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 
 		Assert.assertEquals(variable.getValue(), "value");
 
-		// check value is sent as empty, and fileUpload set to a file
+		// check value is sent as empty, and uploadFile set to a file
 		verify(updateVariableRequestWithFile).field("value", "");
-		verify(updateVariableRequestWithFile).field(eq("fileUpload"), any(File.class));
+		verify(updateVariableRequestWithFile).field(eq("uploadFile"), any(File.class));
 	}
 
 	@Test(groups= {"ut"})
@@ -623,9 +623,9 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		Assert.assertEquals(variable.getName(), "key");
 		Assert.assertEquals(variable.getInternalName(), TestVariable.TEST_VARIABLE_PREFIX + "key");
 
-		// check value is sent, and fileUpload set to null
+		// check value is sent, and uploadFile set to null
 		verify(createVariableRequestWithFile).field("value", "value");
-		verify(createVariableRequestWithFile).field("fileUpload", (File)null);
+		verify(createVariableRequestWithFile).field("uploadFile", (File)null);
 	}
 
 	@Test(groups= {"ut"})
@@ -646,9 +646,9 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		Assert.assertEquals(variable.getName(), "key");
 		Assert.assertEquals(variable.getInternalName(), TestVariable.TEST_VARIABLE_PREFIX + "key");
 
-		// check value is sent as empty, and fileUpload set to provided file
+		// check value is sent as empty, and uploadFile set to provided file
 		verify(createVariableRequestWithFile).field("value", "");
-		verify(createVariableRequestWithFile).field(eq("fileUpload"), any(File.class));
+		verify(createVariableRequestWithFile).field(eq("uploadFile"), any(File.class));
 	}
 
 	@Test(groups= {"ut"})

@@ -50,7 +50,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	private static final String FIELD_TIME_TO_LIVE = "timeToLive";
 	private static final String FIELD_VERSION = "version";
 	private static final String FIELD_VALUE = "value";
-	private static final String FIELD_FILE_UPLOAD = "fileUpload";
+	private static final String FIELD_UPLOAD_FILE = "uploadFile";
 	public static final String VARIABLE_API_URL = "/variable/api/variable/";
 	public static final String EXISTING_VARIABLE_API_URL = "/variable/api/variable/%d/";
 	public static final String VARIABLE_FILE_API_URL = "/variable/api/variable/%d/file";
@@ -340,11 +340,11 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 				.field(FIELD_TIME_TO_LIVE, String.valueOf(variable.getTimeToLive()));
 
 		if (variable.getRemoteFileUrl() != null) {
-			request = request.field(FIELD_FILE_UPLOAD, variable._getFile())
+			request = request.field(FIELD_UPLOAD_FILE, variable._getFile())
 					.field(FIELD_VALUE, "");
 		} else {
 			request = request.field(FIELD_VALUE, variable._getValue())
-					.field(FIELD_FILE_UPLOAD, (File) null);
+					.field(FIELD_UPLOAD_FILE, (File) null);
 		}
 
 		JSONObject variableJson = getJSonResponse(request);
@@ -389,12 +389,12 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 		}
 
 		if (variable._getFile() != null) {
-			request = request.field(FIELD_FILE_UPLOAD, variable._getFile())
+			request = request.field(FIELD_UPLOAD_FILE, variable._getFile())
 					.field(FIELD_VALUE, "");
 
 		} else {
 			request = request.field(FIELD_VALUE, variable._getValue())
-					.field(FIELD_FILE_UPLOAD, (File)null);
+					.field(FIELD_UPLOAD_FILE, (File)null);
 		}
 		
 		JSONObject variableJson = getJSonResponse(request);
