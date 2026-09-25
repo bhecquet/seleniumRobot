@@ -477,7 +477,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 
 		// check value is sent, and uploadFile set to null
 		verify(updateVariableRequestWithFile).field("value", "value");
-		verify(updateVariableRequestWithFile).field("uploadFile", (File)null);
+		verify(updateVariableRequestWithFile).field("uploadFile", "");
 	}
 
 	@Test(groups= {"ut"})
@@ -625,7 +625,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 
 		// check value is sent, and uploadFile set to null
 		verify(createVariableRequestWithFile).field("value", "value");
-		verify(createVariableRequestWithFile).field("uploadFile", (File)null);
+		verify(createVariableRequestWithFile).field("uploadFile", "");
 	}
 
 	@Test(groups= {"ut"})

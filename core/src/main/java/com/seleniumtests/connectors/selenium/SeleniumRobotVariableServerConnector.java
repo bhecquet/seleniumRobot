@@ -344,7 +344,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 					.field(FIELD_VALUE, "");
 		} else {
 			request = request.field(FIELD_VALUE, variable._getValue())
-					.field(FIELD_UPLOAD_FILE, (File) null);
+					.field(FIELD_UPLOAD_FILE, "");
 		}
 
 		JSONObject variableJson = getJSonResponse(request);
@@ -394,7 +394,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 
 		} else {
 			request = request.field(FIELD_VALUE, variable._getValue())
-					.field(FIELD_UPLOAD_FILE, (File)null);
+					.field(FIELD_UPLOAD_FILE, "");
 		}
 		
 		JSONObject variableJson = getJSonResponse(request);
