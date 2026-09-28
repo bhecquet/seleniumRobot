@@ -1005,11 +1005,19 @@ public class SeleniumTestsContext {
     		// get variable from server if they have never been get
             Map<String, TestVariable> variablesFromServer = variableAlreadyRequestedFromServer;
     		if (variableAlreadyRequestedFromServer == null) {
-                variablesFromServer = variableServer.getVariables(seleniumRobotServerContext.getSeleniumRobotServerVariableOlderThan(), seleniumRobotServerContext.getSeleniumRobotServerVariableReservationDuration());
 
-                // when we are out of a test, do not store the variables, as they are not specific to test
                 if (testNGResult != null) {
+                    variablesFromServer = variableServer.getVariables(seleniumRobotServerContext.getSeleniumRobotServerVariableOlderThan(), seleniumRobotServerContext.getSeleniumRobotServerVariableReservationDuration());
                     variableAlreadyRequestedFromServer = variablesFromServer;
+                } else {
+
+                    // when we are out of a test, do not store the variables, as they are not specific to test
+                    // also, do not reserve variables, so that they are kept available for tests
+                    variablesFromServer = variableServer.getVariables(seleniumRobotServerContext.getSeleniumRobotServerVariableOlderThan(),
+                            null,
+                            null,
+                            false,
+                            -1);
                 }
     		}
     		getConfiguration().putAll(variablesFromServer);

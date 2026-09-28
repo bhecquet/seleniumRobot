@@ -80,7 +80,7 @@ public class MockitoTest extends ParentTest {
 	public void initThreadContext(final ITestContext testNGCtx,  final String testName, final ITestResult testResult) {
 		System.setProperty("applicationName", "core");
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, testResult);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, testResult, "");
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());

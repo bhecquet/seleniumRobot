@@ -330,7 +330,7 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 
 		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
 			when(variableServerMock.isAlive()).thenReturn(true);
-			when(variableServerMock.getVariables(0, -1)).thenReturn(variables);
+			when(variableServerMock.getVariables(0, null, null, false, -1)).thenReturn(variables);
 		})){
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
@@ -340,19 +340,56 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			initThreadContext(testNGCtx, "myTest", testResult);
 
-			SeleniumTestsContextManager.initThreadContext();
+			SeleniumTestsContextManager.initThreadContext("beforeDataProviderExecution"); // in this case testngresult is null
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 
 			// check that variables are kept even if variable server has not been re-called
 			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key").getValue(), "val1");
 
 			// only one call, done by first context init, further retrieving is forbidden
-			verify(seleniumTestsCtx.getVariableServer()).getVariables(0, -1);
+			// check that without testngresult, no reservation is performed
+			verify(seleniumTestsCtx.getVariableServer()).getVariables(0, null, null, false, -1);
 
 			// variables are not stored for re-use because they have been retrieved without a test
 			Assert.assertNull(seleniumTestsCtx.getVariableAlreadyRequestedFromServer());
 			Assert.assertNull(seleniumTestsCtx.getTestNGResult());
 			Assert.assertEquals(seleniumTestsCtx.getOutputDirectory(), SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
+		}
+	}
+
+	/**
+	 * Check that context is not initialized if origin is not data provider init
+	 */
+	@Test(groups = { "ut" })
+	public void testConfigureContextWithoutTestNGResultAndNotRequestedByDataProvider(final ITestContext testNGCtx)
+			throws Exception {
+
+		Map<String, TestVariable> variables = new HashMap<>();
+		variables.put("key", new TestVariable("key", "val1"));
+
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
+			when(variableServerMock.isAlive()).thenReturn(true);
+			when(variableServerMock.getVariables(0, null, null, false, -1)).thenReturn(variables);
+		})){
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
+
+
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+
+			SeleniumTestsContextManager.initThreadContext("otherOrigin"); // in this case testngresult is null
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+
+			// check that variables are not get as origin is not from server
+			Assert.assertNull(seleniumTestsCtx.getConfiguration().get("key"));
+			Assert.assertNull(seleniumTestsCtx.getVariableServer());
 
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);

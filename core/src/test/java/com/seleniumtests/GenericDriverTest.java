@@ -49,7 +49,7 @@ public class GenericDriverTest extends ParentTest {
 	public void initTest(final ITestContext testNGCtx, final ITestResult testResult) {
 		System.setProperty("applicationName", "core");
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, testResult);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, testResult, "");
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
@@ -60,7 +60,7 @@ public class GenericDriverTest extends ParentTest {
 	public void initThreadContext(final ITestContext testNGCtx) {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
 		try {
-			SeleniumTestsContextManager.initThreadContext(testNGCtx, GenericTest.generateResult(testNGCtx, getClass()));
+			SeleniumTestsContextManager.initThreadContext(testNGCtx, GenericTest.generateResult(testNGCtx, getClass()), "");
 		} catch (NoSuchMethodException | SecurityException | NoSuchFieldException | IllegalArgumentException
 				| IllegalAccessException e) {
 			// ignore

@@ -118,6 +118,8 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			// check get variables has been called once for each retry
 			// the fact that it's not the same instance that reserve variable and unreserve them is due to init of variable server in @Before methods
 			// and variableServer instances are not reused
+
+			// init context for tests
 			verify(mockedVariableServer.constructed().get(0)).getVariables(0, -1);
 			verify(mockedVariableServer.constructed().get(3)).getVariables(0, -1);
 			verify(mockedVariableServer.constructed().get(6)).getVariables(0, -1);
@@ -152,6 +154,19 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			Assert.assertTrue(detailedReportContent1.contains("[NOT RETRYING] max retry count (1) reached"));
 			String detailedReportContent2 = readTestMethodResultFile("testKo-1");
 			Assert.assertTrue(detailedReportContent2.contains("[NOT RETRYING] max retry count (1) reached"));
+
+			// Check init of contexts
+			// init of context with data provider => variable are not reserved
+			verify(mockedVariableServer.constructed().get(0)).getVariables(0, null, null, false, -1);
+
+			// init context for tests
+			verify(mockedVariableServer.constructed().get(1)).getVariables(0, -1);
+			verify(mockedVariableServer.constructed().get(4)).getVariables(0, -1);
+			verify(mockedVariableServer.constructed().get(7)).getVariables(0, -1);
+			verify(mockedVariableServer.constructed().get(3)).unreserveVariables(anyList());
+			verify(mockedVariableServer.constructed().get(6)).unreserveVariables(anyList());
+			verify(mockedVariableServer.constructed().get(9)).unreserveVariables(anyList());
+
 
 
 		} finally {

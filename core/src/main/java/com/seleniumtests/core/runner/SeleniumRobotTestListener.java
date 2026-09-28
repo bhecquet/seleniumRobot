@@ -287,7 +287,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			SeleniumTestsContext seleniumTestsContext = SeleniumTestsContextManager.getThreadContext();
 			seleniumTestsContext.configureContext(null);
 		} catch (ConfigurationException e) {
-			SeleniumTestsContextManager.initThreadContext();
+			SeleniumTestsContextManager.initThreadContext("beforeDataProviderExecution");
 		}
 	}
 

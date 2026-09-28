@@ -427,7 +427,7 @@ public class SeleniumTestsContextManager {
 		if (currentContext != null) {
 			SeleniumTestsContextManager.setThreadContext(currentContext);
 		} else {
-			SeleniumTestsContextManager.initThreadContext();
+			SeleniumTestsContextManager.initThreadContext("insertThreadContext");
 		}
 		
 		if (configureContext) {
@@ -449,19 +449,20 @@ public class SeleniumTestsContextManager {
 	}
 
 
-    public static void initThreadContext() {
-        initThreadContext(globalContext.getTestNGContext(), null);
+    public static void initThreadContext(String origin) {
+        initThreadContext(globalContext.getTestNGContext(), null, origin);
     }
 
-    public static void initThreadContext(ITestContext testNGCtx, ITestResult testResult) {
+    public static void initThreadContext(ITestContext testNGCtx, ITestResult testResult, String origin) {
 
-    	String origin = testResult != null ? "InitThreadContext-" + TestNGResultUtils.getTestName(testResult) : "InitThreadContext";
     	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(testNGCtx, origin);
         
         threadLocalContext.set(seleniumTestsCtx);
         
         // update some values after init. These init call the thread context previously created
-		seleniumTestsCtx.configureContext(testResult);
+		if (testResult != null || "beforeDataProviderExecution".equals(origin)) {
+			seleniumTestsCtx.configureContext(testResult);
+		}
     }
     
     /**

@@ -53,7 +53,7 @@ public class MockitoTestListener implements ITestListener, IInvokedMethodListene
 
     public void initThreadContext(final ITestContext testNGCtx, final ITestResult testResult) {
         SeleniumTestsContextManager.initGlobalContext(testNGCtx);
-        SeleniumTestsContextManager.initThreadContext(testNGCtx, testResult);
+        SeleniumTestsContextManager.initThreadContext(testNGCtx, testResult, "");
         SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
         SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
         SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
