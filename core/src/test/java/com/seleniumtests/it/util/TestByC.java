@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,11 +43,12 @@ import static com.seleniumtests.uipage.ByC.*;
 
 public class TestByC extends GenericTest {
 	
-	public TestByC() throws Exception {
+	public TestByC() {
+		// nothing to do
 	}
 	
 	@BeforeClass(groups={"it"})
-	public void initDriver(final ITestContext testNGCtx) throws Exception {
+	public void initDriver(final ITestContext testNGCtx) {
 		System.setProperty("applicationName", "core");
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
@@ -59,7 +60,7 @@ public class TestByC extends GenericTest {
 		new DriverTestPage(true); // start displaying page
 	}
 	
-	
+	@Override
 	@AfterClass(groups={"it"}, alwaysRun=true)
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
@@ -71,7 +72,7 @@ public class TestByC extends GenericTest {
 		DriverTestPage.textSelectedId.clear();
 		DriverTestPage.textSelectedText.clear();
 	}
-	
+
 	public void testFindElementByLabelForward(String labelToSearch) {
 		new TextFieldElement("", ByC.labelForward(labelToSearch, "input")).sendKeys("element found by label");
 		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by label");
@@ -290,6 +291,18 @@ public class TestByC extends GenericTest {
 	@Test(groups={"it"})
 	public void testFindElementByTextInsideChild2() {
 		Assert.assertEquals(new TextFieldElement("", ByC.textInside("child of*", "div")).getAttribute("id"), "child5");
+	}
+	@Test(groups={"it"})
+	public void testFindElementByTextInsideChild3() {
+		Assert.assertEquals(new TextFieldElement("", ByC.text("child of child", "div", true)).getAttribute("id"), "child5");
+	}
+
+	/**
+	 * In case the element itself and its child have the same text, we return the element, not the child
+	 */
+	@Test(groups={"it"})
+	public void testFindElementByTextInsideChildSameText() {
+		Assert.assertEquals(new TextFieldElement("", ByC.text("child with same text", "div", true)).getAttribute("id"), "child6");
 	}
 	@Test(groups={"it"}, expectedExceptions = NoSuchElementException.class)
 	public void testFindElementByTextInsideChildNotFound() {

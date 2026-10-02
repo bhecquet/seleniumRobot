@@ -241,10 +241,21 @@ public class ByC extends By {
      * @param tagName           tag of the element to search
      */
     public static ByC partialText(final String textToSearch, final String tagName) {
-        return text(textToSearch, tagName, true, false);
+        return text(textToSearch, tagName, true, false, true);
     }
     public static ByC text(final String textToSearch, final String tagName) {
-        return text(textToSearch, tagName, false, false);
+        return text(textToSearch, tagName, false, false, true);
+    }
+
+
+    /**
+     * Search for an element with 'tagName' whose text is found inside the element or a sub-element
+     * @param textToSearch      The text to search in element or sub elements
+     * @param tagName           The tagname of the element we want to find
+     * @param inElementOrChildren   If true, search will be done in element and sub-element. If false, it's equivalent to ByC.text(textToSearch, tagName)
+     */
+    public static ByC text(final String textToSearch, final String tagName, boolean inElementOrChildren) {
+        return text(textToSearch, tagName, false, inElementOrChildren, true);
     }
 
     /**
@@ -253,11 +264,20 @@ public class ByC extends By {
      * @param tagName           The tagname of the element we want to find
      */
     public static ByC textInside(final String textToSearch, final String tagName) {
-        return text(textToSearch, tagName, false, true);
+        return text(textToSearch, tagName, false, true, false);
     }
-    
-    private static ByC text(final String textToSearch, String tagName, boolean partial, boolean textInSubElement) {
-        return new ByText(textToSearch, tagName, partial, textInSubElement);
+
+    /**
+     * Search element by text
+     * @param textToSearch      the text to search
+     * @param tagName           the tagName in which text should be found (directly or in children if requested)
+     * @param partial           whether we should search the text strictly
+     * @param textInSubElement  whether we should search the text in sub-element
+     * @param textInElement     whether we should search the text in the element itself (both textInSubElement and textInElement may be used, if text can be found in  both, then parent element will be the first returned)
+     * @return  the selector
+     */
+    private static ByC text(final String textToSearch, String tagName, boolean partial, boolean textInSubElement, boolean textInElement) {
+        return new ByText(textToSearch, tagName, partial, textInSubElement, textInElement);
     }
     
     /**
@@ -353,7 +373,7 @@ public class ByC extends By {
      * @return A By which locates A elements by the exact text it displays.
      */
     public static By xLinkText(String linkText) {
-        return new ByText(linkText, "*", false, false);
+        return new ByText(linkText, "*", false, false, true);
     }
     
     /**
@@ -363,7 +383,7 @@ public class ByC extends By {
      * @return a By which locates elements that contain the given link text.
      */
     public static By xPartialLinkText(String partialLinkText) {
-        return new ByText(partialLinkText, "*", true, false);
+        return new ByText(partialLinkText, "*", true, false, true);
     }
     
     /**
@@ -543,9 +563,7 @@ public class ByC extends By {
         public WebElement findElement(SearchContext context) {
             List<WebElement> elements;
             elements = context.findElements(By.xpath(getEffectiveXPath()));
-            List<WebElement> elementsReverse = elements.subList(0, elements.size());
-            Collections.reverse(elementsReverse);
-            return elementsReverse.get(0);
+            return elements.getLast();
         }
         
         @NotNull
@@ -732,8 +750,16 @@ public class ByC extends By {
         private final String tagName;
         private final boolean partial;
         private final boolean textInSubElement;
-        
-        public ByText(String text, String tagName, boolean partial, boolean textInSubElement) {
+        private final boolean textInElement;
+
+        /**
+         * @param text      the text to search
+         * @param tagName           the tagName in which text should be found (directly or in children if requested)
+         * @param partial           whether we should search the text strictly
+         * @param textInSubElement  whether we should search the text in sub-element
+         * @param textInElement     whether we should search the text in the element itself (both textInSubElement and textInElement may be used, if text can be found in  both, then parent element will be the first returned)
+         */
+        public ByText(String text, String tagName, boolean partial, boolean textInSubElement, boolean textInElement) {
             
             if (text == null) {
                 throw new IllegalArgumentException("Cannot find elements with a null text content.");
@@ -746,6 +772,7 @@ public class ByC extends By {
             this.tagName = tagName;
             this.partial = partial;
             this.textInSubElement = textInSubElement;
+            this.textInElement = textInElement;
         }
         
         @Override
@@ -753,7 +780,11 @@ public class ByC extends By {
             if (partial && !text.endsWith("*")) {
                 text += "*";
             }
-            if (textInSubElement) {
+            if (textInSubElement && textInElement) {
+                String selectorForText = buildSelectorForText(text);
+                // it seems that when searching all elements, the highest element is positioned last in the list returned by findelements
+                return String.format("(.//%s%s|.//%s[* and .//*%s])", tagName, selectorForText, tagName, selectorForText);
+            } else if (textInSubElement) {
                 return String.format(".//%s[* and .//*%s]", tagName, buildSelectorForText(text));
             } else {
                 return String.format(".//%s%s", tagName, buildSelectorForText(text));
@@ -772,8 +803,8 @@ public class ByC extends By {
             if (textInSubElement) {
                 List<WebElement> elements = context.findElements(By.xpath(getEffectiveXPath()));
                 try {
-                    return elements.get(elements.size() - 1);
-                } catch (IndexOutOfBoundsException e) {
+                    return elements.getLast();
+                } catch (java.util.NoSuchElementException e) {
                     throw new NoSuchElementException("Cannot find any element by text " + text);
                 }
             } else {
@@ -847,8 +878,8 @@ public class ByC extends By {
         @Override
         public WebElement findElement(@NotNull SearchContext context) {
             try {
-                return findElements(context).get(0);
-            } catch (IndexOutOfBoundsException e) {
+                return findElements(context).getFirst();
+            } catch (java.util.NoSuchElementException e) {
                 throw new NoSuchElementException(ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA);
             }
         }
@@ -912,7 +943,7 @@ public class ByC extends By {
                 if (elements.isEmpty()) { // first iteration
                     hosts = by.findElements(context);
                 } else {
-                    hosts = elements.get(0).findElements(by);
+                    hosts = elements.getFirst().findElements(by);
                     elements = new ArrayList<>(); // reset list because we don't care parent elements
                 }
                 
@@ -954,8 +985,8 @@ public class ByC extends By {
         @Override
         public WebElement findElement(@NotNull SearchContext context) {
             try {
-                return findElements(context).get(0);
-            } catch (IndexOutOfBoundsException e) {
+                return findElements(context).getFirst();
+            } catch (java.util.NoSuchElementException e) {
                 throw new NoSuchElementException(ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA);
             }
         }
@@ -1062,8 +1093,8 @@ public class ByC extends By {
         @Override
         public WebElement findElement(@NotNull SearchContext context) {
             try {
-                return findElements(context).get(0);
-            } catch (IndexOutOfBoundsException e) {
+                return findElements(context).getFirst();
+            } catch (java.util.NoSuchElementException e) {
                 throw new NoSuchElementException(ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA + toString());
             }
         }
