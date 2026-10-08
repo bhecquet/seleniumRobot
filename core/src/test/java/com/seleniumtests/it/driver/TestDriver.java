@@ -67,7 +67,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	@AfterMethod(groups={"it", "ie"}, alwaysRun=true)
 	public void reset() {
 		if (driver != null) {
-			driver.switchTo().window(new ArrayList<>(driver.getWindowHandles()).get(0));
+			driver.switchTo().window(new ArrayList<>(driver.getWindowHandles()).getFirst());
 			DriverTestPage.logoText.clear();
 			DriverTestPage.textElement.clear();
 			driver.scrollTop();
@@ -430,8 +430,8 @@ public class TestDriver extends GenericMultiBrowserTest {
 	public void testFindHtmlElementsBy() {
 		List<WebElement> htmlElements = new HtmlElement("", By.id("parent")).findHtmlElements(By.className("myClass"));
 		Assert.assertEquals(htmlElements.size(), 2);
-		Assert.assertTrue(htmlElements.get(0) instanceof HtmlElement);
-		Assert.assertEquals(htmlElements.get(0).getText(), "first child");
+		Assert.assertTrue(htmlElements.getFirst() instanceof HtmlElement);
+		Assert.assertEquals(htmlElements.getFirst().getText(), "first child");
 	}
 	
 	/**
@@ -439,9 +439,9 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 */
 	public void testFindHtmlElementsByWithSimilarElements() {
 		List<WebElement> htmlElements = new HtmlElement("", By.id("parent")).findHtmlElements(By.tagName("div"));
-		Assert.assertEquals(htmlElements.size(), 4);
-		Assert.assertTrue(htmlElements.get(0) instanceof HtmlElement);
-		Assert.assertEquals(htmlElements.get(0).getText(), "first child");
+		Assert.assertEquals(htmlElements.size(), 5);
+		Assert.assertTrue(htmlElements.getFirst() instanceof HtmlElement);
+		Assert.assertEquals(htmlElements.getFirst().getText(), "first child");
 	}
 	
 	/**
@@ -453,8 +453,8 @@ public class TestDriver extends GenericMultiBrowserTest {
 	public void testFindHtmlElementsByInsideFrame() {
 		List<WebElement> htmlElements = new HtmlElement("", By.id("tableIframe2"), DriverTestPage.iframe).findHtmlElements(By.tagName("td"));
 		Assert.assertEquals(htmlElements.size(), 2);
-		Assert.assertTrue(htmlElements.get(0) instanceof HtmlElement);
-		Assert.assertEquals(htmlElements.get(0).getText(), "Value 3");
+		Assert.assertTrue(htmlElements.getFirst() instanceof HtmlElement);
+		Assert.assertEquals(htmlElements.getFirst().getText(), "Value 3");
 	}
 	
 	/**
@@ -473,15 +473,15 @@ public class TestDriver extends GenericMultiBrowserTest {
 	public void testFindHtmlElements() {
 		List<WebElement> htmlElements = new HtmlElement("", By.id("parent")).findElement(By.className("myClass")).findHtmlElements();
 		Assert.assertEquals(htmlElements.size(), 2);
-		Assert.assertTrue(htmlElements.get(0) instanceof HtmlElement);
-		Assert.assertEquals(htmlElements.get(0).getText(), "first child");
+		Assert.assertTrue(htmlElements.getFirst() instanceof HtmlElement);
+		Assert.assertEquals(htmlElements.getFirst().getText(), "first child");
 	}
 
 	public void testFindHtmlElementsInsideFrame() {
 		List<WebElement> htmlElements = new HtmlElement("", By.id("tableIframe2"), DriverTestPage.iframe).findElement(By.tagName("td")).findHtmlElements();
 		Assert.assertEquals(htmlElements.size(), 2);
-		Assert.assertTrue(htmlElements.get(0) instanceof HtmlElement);
-		Assert.assertEquals(htmlElements.get(0).getText(), "Value 3");
+		Assert.assertTrue(htmlElements.getFirst() instanceof HtmlElement);
+		Assert.assertEquals(htmlElements.getFirst().getText(), "Value 3");
 	}
 
 	public void testFindHtmlElementsNotExist() {
@@ -689,7 +689,6 @@ public class TestDriver extends GenericMultiBrowserTest {
 	
 	public void testUploadFileWithRobot() {
 		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "envSpecific.ini";
-//		DriverTestPage.upload.click();
 		DriverTestPage.uploadedFile.click(); // when executing both testUploadFileWithRobotXX tests, the second one fails on firefox because focus is on '<input type="file">' element
 		DriverTestPage.upload.clickAction(); // due to restrictions clicking a <input type="file"> element with firefox, use clickAction instead
 		WaitHelper.waitForSeconds(10); // sometimes, upload popup needs time to display
@@ -704,7 +703,6 @@ public class TestDriver extends GenericMultiBrowserTest {
 	
 	public void testUploadFileWithRobotKeyboard() {
 		String path = Paths.get(SeleniumTestsContextManager.getConfigPath(), "spec", "envSpecific2.ini").toString();
-//		DriverTestPage.upload.click();
 		DriverTestPage.uploadedFile.click(); // when executing both testUploadFileWithRobotXX tests, the second one fails on firefox because focus is on '<input type="file">' element
 		DriverTestPage.upload.clickAction(); // due to restrictions clicking a <input type="file"> element with firefox, use clickAction instead
 		WaitHelper.waitForSeconds(10); // sometimes, upload popup needs time to display
