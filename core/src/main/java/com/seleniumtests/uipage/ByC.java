@@ -44,7 +44,10 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
+
+import static com.seleniumtests.driver.CustomEventFiringWebDriver.*;
 
 public class ByC extends By {
     
@@ -659,16 +662,11 @@ public class ByC extends By {
                     return null;
                 }
             }
-            //Issue #792 : check if the current page/screen is scrollable before returning the selector
-            if (isScreenScrollable(WebUIDriver.getWebDriver(false))) {
+            if (CustomEventFiringWebDriver.isScreenScrollable(WebUIDriver.getWebDriver(false))) {
                 return String.format("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().%s.instance(0))", selector);
             } else {
-                return String.format("new UiScrollable(new UiSelector().scrollable(false).instance(0)).scrollIntoView(new UiSelector().%s.instance(0))", selector);
+                return String.format("new UiSelector().%s.instance(0)", selector);
             }
-        }
-
-        private boolean isScreenScrollable(SearchContext context) {
-            return !context.findElements(AppiumBy.androidUIAutomator("new UiSelector().scrollable(true)")).isEmpty();
         }
         
         @Override
@@ -679,13 +677,19 @@ public class ByC extends By {
         @NotNull
         @Override
         public List<WebElement> findElements(@NotNull SearchContext context) {
-            CustomEventFiringWebDriver currentDriver = WebUIDriver.getWebDriver(false);
+        	CustomEventFiringWebDriver currentDriver = WebUIDriver.getWebDriver(false);
             String androidSelector = null;
-            if (!currentDriver.isWebTest()
-                    && currentDriver.getOriginalDriver() instanceof AndroidDriver) {
+            boolean isAndroidApp = !currentDriver.isWebTest()
+                    && currentDriver.getOriginalDriver() instanceof AndroidDriver;
+            if (isAndroidApp) {
                 androidSelector = buildAndroidUiSelector();
             }
             if (androidSelector != null) {
+                if (isActivityCompose(currentDriver)) {
+                    // Screens built with Jetpack Compose do not expose the "scrollable" node used above: fall back
+                    // to a swipe-based search since UiScrollable#scrollIntoView() won't find off-screen elements
+                    return swipeToFindElement((AndroidDriver) currentDriver.getOriginalDriver(), AppiumBy.androidUIAutomator(androidSelector));
+                }
                 return context.findElements(AppiumBy.androidUIAutomator(androidSelector));
             } else {
                 if (useCssSelector) {
@@ -705,8 +709,17 @@ public class ByC extends By {
                     && currentDriver.getOriginalDriver() instanceof AndroidDriver) {
                 androidSelector = buildAndroidUiSelector();
             }
-            if (androidSelector != null) {
-                return context.findElement(AppiumBy.androidUIAutomator(androidSelector));
+        	if (androidSelector != null) {
+                if (isActivityCompose(currentDriver)) {
+                    // Screens built with Jetpack Compose do not expose the "scrollable" node used above: fall back
+                    // to a swipe-based search since UiScrollable#scrollIntoView() won't find off-screen elements
+                    List<WebElement> elements = swipeToFindElement((AndroidDriver) currentDriver.getOriginalDriver(), AppiumBy.androidUIAutomator(androidSelector));
+                    if (elements.isEmpty()) {
+                        throw new NoSuchElementException(ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA + toString());
+                    }
+                    return elements.get(0);
+                }            
+            return context.findElement(AppiumBy.androidUIAutomator(androidSelector));
             } else {
                 if (useCssSelector) {
                     return context.findElement(By.cssSelector(getEffectiveCssSelector()));

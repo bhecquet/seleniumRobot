@@ -30,9 +30,12 @@ import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.video.VideoRecorder;
+
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.ExecutesMethod;
 import io.appium.java_client.HidesKeyboard;
+import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.SupportsContextSwitching;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
@@ -44,6 +47,7 @@ import org.mockito.MockingDetails;
 import org.mockito.Mockito;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Interactive;
+import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.*;
 import org.openqa.selenium.safari.SafariDriver;
@@ -75,7 +79,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.*;
+import java.util.function.BooleanSupplier;
 
 /**
  * This class acts as a proxy for everything related to selenium driver actions (mostly a bypass) or with the machine holding
@@ -1135,44 +1141,207 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		}
 	}
 	
-	/**
-	 * scroll to the given element
-	 * we scroll 200 px to the left of the element so that we see all of it
-	 * @param element	element to scroll to
-	 * @param yOffset	offset from the center of the element to scroll
-	 */
-	public void scrollToElement(WebElement element, int yOffset) {
-		if (isWebTest()) {
-			try {
-				WebElement parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT, element, (driver instanceof SafariDriver) ? SAFARI_BROWSER: OTHER_BROWSER);
-				Long topHeaderSize = (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_TOP_HEADER);
+    /**
+     * scroll to the given element
+     * we scroll 200 px to the left of the element so that we see all of it
+     *
+     * @param element element to scroll to
+     * @param yOffset offset from the center of the element to scroll
+     */
+    public void scrollToElement(WebElement element, int yOffset) {
+        if (isWebTest()) {
+            try {
+                WebElement parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT, element, (driver instanceof SafariDriver) ? SAFARI_BROWSER : OTHER_BROWSER);
+                Long topHeaderSize = (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_TOP_HEADER);
 
-				// try a second method (the first one is quicker but does not work when element is inside a document fragment, slot or shadow DOM
+                // try a second method (the first one is quicker but does not work when element is inside a document fragment, slot or shadow DOM
 //				if ((parentScrollableElement == null || "html".equalsIgnoreCase(parentScrollableElement.getTagName())) && !(driver instanceof InternetExplorerDriver)) {
 //					parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT2, element, (driver instanceof SafariDriver) ? SAFARI_BROWSER: OTHER_BROWSER);
 //				}
-				
-				if (parentScrollableElement != null) {
-					scrollParent(element, yOffset, parentScrollableElement, topHeaderSize);
-				} else {
-					// go to default behavior
-					throw new JavascriptException("No parent found");
-				}
-				
-			} catch (Exception e) {
-				// fall back to legacy behavior
-				if (yOffset == Integer.MAX_VALUE) {
-					yOffset = -200;
-				}
-				try {
-					scrollWindowToElement(element, yOffset);
-				} catch (Exception e1) {
-					logger.info(String.format("Cannot scroll to element %s: %s", element.toString(), e1.getMessage()));
-				}
-			}
-		}
-	}
 
+                if (parentScrollableElement != null) {
+                    scrollParent(element, yOffset, parentScrollableElement, topHeaderSize);
+                } else {
+                    // go to default behavior
+                    throw new JavascriptException("No parent found");
+                }
+
+            } catch (Exception e) {
+                // fall back to legacy behavior
+                if (yOffset == Integer.MAX_VALUE) {
+                    yOffset = -200;
+                }
+                try {
+                    scrollWindowToElement(element, yOffset);
+                } catch (Exception e1) {
+                    logger.info(String.format("Cannot scroll to element %s: %s", element.toString(), e1.getMessage()));
+                }
+            }
+        } else if (WebUIDriver.getWebDriver(false).getOriginalDriver() instanceof AndroidDriver androidDriver
+                && isScreenScrollable(androidDriver)) {
+            // yOffset is not relevant for native Android apps: we simply swipe (reusing the same swipe-based
+            // scrolling strategy as ByC#swipeToFindElement) until the element becomes displayed
+            if (!swipeToElement(androidDriver, element)) {
+                logger.info(String.format("Cannot scroll to element %s: element not found after swiping", element.toString()));
+            }
+        }
+    }
+
+
+    /**
+     * Default maximum number of swipes performed by swipe based scrolling methods ({@link #swipeToFindElement(AndroidDriver, By)},
+     * {@link #swipeToElement(AndroidDriver, WebElement, int)}) before giving up.
+     * This is a safety limit to avoid an infinite loop in case the page content keeps changing (e.g. animations)
+     * without ever reaching the searched element nor a stable bottom of page.
+     */
+    public static final int DEFAULT_MAX_SWIPES = 30;
+
+    /**
+     * Checks if the current Android screen exposes a "scrollable" UiAutomator accessibility node.
+     *
+     * @param context the context (usually the driver) used to search the node
+     * @return true if the screen is scrollable
+     */
+    public static boolean isScreenScrollable(SearchContext context) {
+        return !context.findElements(AppiumBy.androidUIAutomator("new UiSelector().scrollable(true)")).isEmpty();
+    }
+
+    /**
+     * Checks if the current Android activity is built with the Jetpack Compose toolkit.
+     * Compose screens do not expose the "scrollable" UiAutomator accessibility node that
+     * {@code UiScrollable#scrollIntoView()} relies on, so they require an alternative scrolling strategy
+     * (see {@link #swipeUntil(AndroidDriver, BooleanSupplier, int)}).
+     *
+     * @param context the context (usually the driver) used to search the node
+     * @return true if the current activity is built with Jetpack Compose
+     */
+    public static boolean isActivityCompose(SearchContext context) {
+        return !context.findElements(AppiumBy.androidUIAutomator("new UiSelector().className(\"androidx.compose.ui.platform.ComposeView\")")).isEmpty();
+    }
+
+    /**
+     * Generic swipe loop used as the base of every swipe based scrolling strategy. It loops, performing a swipe
+     * from the bottom to the top of the screen (which makes the displayed content scroll down) and then checking
+     * {@code stopCondition}. The loop stops as soon as:
+     * <ul>
+     *     <li>{@code stopCondition} is met (e.g.: the searched element has been found, or a known element is now displayed)</li>
+     *     <li>the bottom of the page has been reached (page content - grabbed with {@code getPageSource()} - is
+     *     identical before and after a swipe, meaning the last swipe had no effect)</li>
+     *     <li>the maximum number of swipes has been performed (safety limit)</li>
+     * </ul>
+     *
+     * @param driver        the Android driver used to perform the swipes
+     * @param stopCondition condition checked before the first swipe, then after each swipe
+     * @param maxSwipes     maximum number of swipes performed before giving up
+     * @return true if {@code stopCondition} has been met, false if the loop stopped for another reason
+     */
+    public static boolean swipeUntil(AndroidDriver driver, BooleanSupplier stopCondition, int maxSwipes) {
+        if (stopCondition.getAsBoolean()) {
+            return true;
+        }
+
+        String previousPageSource = driver.getPageSource();
+        int swipeCount = 0;
+
+        while (swipeCount < maxSwipes) {
+            swipeDown(driver);
+            swipeCount++;
+
+            if (stopCondition.getAsBoolean()) {
+                return true;
+            }
+
+            // Check if we've reached the bottom of the page (content unchanged after swipe)
+            String currentPageSource = driver.getPageSource();
+            if (Objects.equals(currentPageSource, previousPageSource)) {
+                break;
+            }
+            previousPageSource = currentPageSource;
+        }
+
+        return false;
+    }
+
+    /**
+     * Some Android screens (typically built with the Jetpack Compose toolkit) do not expose the "scrollable"
+     * UiAutomator accessibility node that {@code UiScrollable#scrollIntoView()} relies on. On those screens, the
+     * classical scrollIntoView mechanism does not manage to find elements located outside the current viewport.
+     * <p>
+     * This method relies on {@link #swipeUntil(AndroidDriver, BooleanSupplier, int)} to search the element again
+     * after each swipe.
+     *
+     * @param driver    the Android driver used to search the element and perform the swipes
+     * @param locator   the locator used to search the element
+     * @param maxSwipes maximum number of swipes performed before giving up
+     * @return the list of found elements. Empty if the element has not been found before the loop stopped
+     */
+    public static List<WebElement> swipeToFindElement(AndroidDriver driver, By locator, int maxSwipes) {
+        List<WebElement> foundElements = new ArrayList<>();
+        swipeUntil(driver, () -> {
+            foundElements.clear();
+            foundElements.addAll(driver.findElements(locator));
+            return !foundElements.isEmpty();
+        }, maxSwipes);
+        return foundElements;
+    }
+
+    /**
+     * Same as {@link #swipeToFindElement(AndroidDriver, By, int)} using {@link #DEFAULT_MAX_SWIPES} as the maximum
+     * number of swipes.
+     */
+    public static List<WebElement> swipeToFindElement(AndroidDriver driver, By locator) {
+        return swipeToFindElement(driver, locator, DEFAULT_MAX_SWIPES);
+    }
+
+    /**
+     * "Stand alone" scroll strategy: swipes down until the given (already found) element is displayed, without
+     * searching it again through a locator. This is useful when the caller already holds a {@link WebElement}
+     * reference and only wants it to become visible (e.g.: {@code CustomEventFiringWebDriver#scrollToElement}),
+     * as opposed to {@link #swipeToFindElement(AndroidDriver, By, int)} which (re)searches the element by locator.
+     *
+     * @param driver    the Android driver used to perform the swipes
+     * @param element   the element that should become visible
+     * @param maxSwipes maximum number of swipes performed before giving up
+     * @return true if the element is displayed, false if it could not be made visible before the loop stopped
+     */
+    public static boolean swipeToElement(AndroidDriver driver, WebElement element, int maxSwipes) {
+        return swipeUntil(driver, () -> {
+            try {
+                return element.isDisplayed();
+            } catch (StaleElementReferenceException e) {
+                return false;
+            }
+        }, maxSwipes);
+    }
+
+    /**
+     * Same as {@link #swipeToElement(AndroidDriver, WebElement, int)} using {@link #DEFAULT_MAX_SWIPES} as the
+     * maximum number of swipes.
+     */
+    public static boolean swipeToElement(AndroidDriver driver, WebElement element) {
+        return swipeToElement(driver, element, DEFAULT_MAX_SWIPES);
+    }
+
+    /**
+     * Perform a swipe gesture from near the bottom to near the top of the screen, so that the displayed content
+     * scrolls down, revealing elements located below the current viewport.
+     */
+    public static void swipeDown(AndroidDriver driver) {
+        Dimension size = driver.manage().window().getSize();
+        int startX = size.width / 2;
+        int startY = (int) (size.height * 0.8);
+        int endY = (int) (size.height * 0.2);
+
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence swipe = new Sequence(finger, 0);
+        swipe.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), startX, startY));
+        swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        swipe.addAction(finger.createPointerMove(Duration.ofMillis(400), PointerInput.Origin.viewport(), startX, endY));
+        swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+
+        driver.perform(Collections.singletonList(swipe));
+    }
+    
 	/**
 	 * Scroll parent of element, in case we have a scroll inside another scroll
 	 * @param element					the element for which we want to scroll parent
