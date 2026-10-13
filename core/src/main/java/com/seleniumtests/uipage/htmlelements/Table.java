@@ -27,7 +27,6 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.uipage.ReplayOnError;
 
 /**
@@ -37,8 +36,8 @@ import com.seleniumtests.uipage.ReplayOnError;
  */
 public class Table extends HtmlElement {
     private static final String ERROR_NO_ROWS = "There are no rows in this table";
-	private List<WebElement> rows = null;
-    private List<WebElement> columns = null;
+	private ThreadLocal<List<WebElement>> rows = new ThreadLocal<>();
+    private ThreadLocal<List<WebElement>> columns = new ThreadLocal<>();
 
     public Table(final String label, final By by) {
         super(label, by);
@@ -83,21 +82,22 @@ public class Table extends HtmlElement {
      */
     public void findTableElement() {
         super.findElement();
-        rows = findHtmlElements(By.tagName("tr"));
-        columns = getColumnsInternal();
+        rows.set(findHtmlElements(By.tagName("tr")));
+        columns.set(getColumnsInternal());
+        logger.info("Found {} rows and {} columns", rows.get().size(), columns.get().size());
     }
 
     private List<WebElement> getColumnsInternal() {
         
         // Need to check whether rows is null AND whether or not the list of rows is empty
-        if (rows != null && !rows.isEmpty()) {
+        if (rows.get() != null && !rows.get().isEmpty()) {
         	
-        	columns = getRowCells(rows.get(0));
+        	columns.set(getRowCells(rows.get().get(0)));
         	
-            if ((columns == null || columns.isEmpty()) && rows.size() > 1) {
-                columns = getRowCells(rows.get(1));
+            if ((columns.get() == null || columns.get().isEmpty()) && rows.get().size() > 1) {
+                columns.set(getRowCells(rows.get().get(1)));
             }
-            return columns;
+            return columns.get();
         } else {
         	return new ArrayList<>();
         }
@@ -109,7 +109,7 @@ public class Table extends HtmlElement {
     @ReplayOnError
     public List<WebElement> getColumns() {
     	findTableElement();
-    	return columns;
+    	return columns.get();
  
     }
 
@@ -119,7 +119,7 @@ public class Table extends HtmlElement {
     @ReplayOnError
     public int getColumnCount() {
     	findTableElement();
-        return columns.size();
+        return columns.get().size();
     }
     
     /**
@@ -164,8 +164,8 @@ public class Table extends HtmlElement {
     public WebElement getCellFromContent(final Pattern content, final int column) {
     	findTableElement();
     	
-    	if (rows != null && !rows.isEmpty()) {
-    		for (WebElement row: rows) {
+    	if (rows.get() != null && !rows.get().isEmpty()) {
+    		for (WebElement row: rows.get()) {
     			List<WebElement> cols = getRowCells(row);
     			
     			if (cols.isEmpty()) {
@@ -199,8 +199,8 @@ public class Table extends HtmlElement {
     public WebElement getRowFromContent(final Pattern content, final int column) {
     	findTableElement();
     	
-    	if (rows != null && !rows.isEmpty()) {
-    		for (WebElement row: rows) {
+    	if (rows.get() != null && !rows.get().isEmpty()) {
+    		for (WebElement row: rows.get()) {
     			List<WebElement> cols = getRowCells(row);
     			
     			if (cols.isEmpty()) {
@@ -242,22 +242,30 @@ public class Table extends HtmlElement {
      * Get table cell
      * <p>
      * Tip: returned element is a HtmlElement, but you must cast it to use its specific methods
+     * @param row    index of the row (starting with 0)
+     * @param column index of the column of the cell
      */
     @ReplayOnError
     public WebElement getCell(final int row, final int column) {
     	findTableElement();
-    	
-    	if (rows != null && !rows.isEmpty()) {
-    		List<WebElement> cols = getRowCells(rows.get(row));
+
+        if (rows.get() == null || rows.get().isEmpty()) {
+            throw new ScenarioException(ERROR_NO_ROWS);
+        } else if (rows.get().size() <= row || row < 0) {
+            throw new ScenarioException(String.format("Table has only %d rows, row %d requested", rows.get().size(), row));
+        } else {
+
+    		List<WebElement> cols = getRowCells(rows.get().get(row));
     		
     		if (cols.isEmpty()) {
     			throw new ScenarioException(String.format("Cell at (%d, %d) could not be found", row, column));
     		}
-    		
+
+            if (cols.size() <= column || column < 0) {
+                throw new ScenarioException(String.format("Row has only %d cells, cell %d requested", cols.size(), column));
+            }
     		return cols.get(column);
     	}
-    	
-    	throw new ScenarioException(ERROR_NO_ROWS);
     }
 
     /**
@@ -265,7 +273,7 @@ public class Table extends HtmlElement {
      */
     public int getRowCount() {
         getRows();
-        return rows.size();
+        return rows.get().size();
     }
 
     /**
@@ -276,7 +284,7 @@ public class Table extends HtmlElement {
     @ReplayOnError
     public List<WebElement> getRows() {
     	findTableElement();
-        return rows;
+        return rows.get();
     }
 
     public boolean isHasBody() {
