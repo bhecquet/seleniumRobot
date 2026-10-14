@@ -84,7 +84,6 @@ public class Table extends HtmlElement {
         super.findElement();
         rows.set(findHtmlElements(By.tagName("tr")));
         columns.set(getColumnsInternal());
-        logger.info("Found {} rows and {} columns", rows.get().size(), columns.get().size());
     }
 
     private List<WebElement> getColumnsInternal() {
