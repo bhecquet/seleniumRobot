@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -52,9 +53,13 @@ public class TestTable extends MockitoTest {
 	@Mock
 	private WebElement row2;
 	@Mock
-	private WebElement col1;
+	private WebElement cell1;
 	@Mock
-	private WebElement col2;
+	private WebElement cell2;
+	@Mock
+	private WebElement cell3;
+	@Mock
+	private WebElement cell4;
 	
 	@Mock
 	private TargetLocator locator;
@@ -83,15 +88,15 @@ public class TestTable extends MockitoTest {
 	 */
 	@AfterMethod(groups={"ut"}, alwaysRun = true)
 	public void checkTableRefresh() {
-		verify(table).findTableElement();
+		verify(table, atLeastOnce()).findTableElement();
 		mockedWebUIDriver.close();
 	}
 
 	@Test(groups={"ut"})
 	public void testGetRows() {
 
-		doReturn(List.of(col1, col2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
-		doReturn(List.of(col1, col2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
+		doReturn(List.of(cell1, cell2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
+		doReturn(List.of(cell3, cell4)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
 
 		Assert.assertEquals(table.getRows().size(), 2);
 	}
@@ -99,7 +104,7 @@ public class TestTable extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testGetColumns() {
 
-		doReturn(List.of(col1, col2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
+		doReturn(List.of(cell1, cell2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
 		doReturn(new ArrayList<>()).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
 		
 		Assert.assertEquals(table.getColumns().size(), 2);
@@ -116,9 +121,55 @@ public class TestTable extends MockitoTest {
 	public void testGetColumnsWithFirstEmptyRow() {
 
 		doReturn(new ArrayList<>()).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
-		doReturn(List.of(col1, col2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
+		doReturn(List.of(cell3, cell4)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
 
 		Assert.assertEquals(table.getColumns().size(), 2);
+	}
+
+	@Test(groups={"ut"})
+	public void testGetCell() {
+		doReturn(List.of(cell1, cell2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
+		doReturn(List.of(cell3, cell4)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
+
+		Assert.assertEquals(table.getCell(0, 0), cell1);
+	}
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Table has only 2 rows, row 2 requested")
+	public void testGetCellWrongRow() {
+		doReturn(List.of(cell1, cell2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
+		doReturn(List.of(cell3, cell4)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
+
+		Assert.assertEquals(table.getCell(2, 0), cell1);
+	}
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Table has only 2 rows, row -1 requested")
+	public void testGetCellWrongRow2() {
+		doReturn(List.of(cell1, cell2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
+		doReturn(List.of(cell3, cell4)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
+
+		Assert.assertEquals(table.getCell(-1, 0), cell1);
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Row has only 2 cells, cell 2 requested")
+	public void testGetCellWrongColumn() {
+		doReturn(List.of(cell1, cell2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
+		doReturn(List.of(cell3, cell4)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
+
+		Assert.assertEquals(table.getCell(0, 2), cell1);
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Row has only 2 cells, cell -1 requested")
+	public void testGetCellWrongColumn2() {
+		doReturn(List.of(cell1, cell2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
+		doReturn(List.of(cell3, cell4)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
+
+		Assert.assertEquals(table.getCell(0, -1), cell1);
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Cell at \\(1, 0\\) could not be found")
+	public void testGetCellNoCell() {
+		doReturn(List.of(cell1, cell2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
+		doReturn(new ArrayList<>()).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
+
+		Assert.assertEquals(table.getCell(1, 0), cell1);
 	}
 
 }
