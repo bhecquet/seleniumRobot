@@ -28,7 +28,7 @@ public class WindowsAppCapabilitiesFactory extends ICapabilitiesFactory {
 
         // name of the application window
         } else if (webDriverConfig.getAppActivity() != null && !webDriverConfig.getAppActivity().isEmpty()) {
-            capabilities.setCapability("appium:appTopLevelWindow", webDriverConfig.getAppActivity());            capabilities.setCapability("appium:appTopLevelWindow", resolveTopLevelWindowHandle(webDriverConfig.getAppActivity()));
+            capabilities.setCapability("appium:appTopLevelWindow", resolveTopLevelWindowHandle(webDriverConfig.getAppActivity()));
         } else {
             throw new ConfigurationException("Either 'app' or 'appActivity' must be provided");
         }
