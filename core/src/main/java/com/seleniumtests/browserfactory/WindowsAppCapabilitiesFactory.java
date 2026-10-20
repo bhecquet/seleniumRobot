@@ -20,7 +20,7 @@ public class WindowsAppCapabilitiesFactory extends ICapabilitiesFactory {
     @Override
     public MutableCapabilities createCapabilities() {
         MutableCapabilities capabilities = new MutableCapabilities((Map.of("platformName", "windows",
-                "appium:automationName", "FlaUI")));
+                "appium:automationName", "NovaWindows")));
 
         // path to the app that will be started
         if (webDriverConfig.getApp() != null && !webDriverConfig.getApp().isEmpty()) {
