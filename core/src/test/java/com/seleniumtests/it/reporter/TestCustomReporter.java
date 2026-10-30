@@ -225,6 +225,45 @@ public class TestCustomReporter extends ReporterTest {
 	}
 
 	@Test(groups={"it"})
+	public void testStepReportSuccessAfter2Retries() throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "2");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithExceptionOnFirst2Exec"});
+
+			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithExceptionOnFirst2Exec", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
+			JSONObject json = new JSONObject(detailedReportContent);
+
+			Assert.assertEquals(json.getInt("retries"), 2);
+			Assert.assertEquals(json.getString("status"), "SUCCESS");
+			Assert.assertEquals(json.getString("rawStatus"), "SUCCESS");
+			Assert.assertEquals(json.getInt("errors"), 0);
+			Assert.assertEquals(json.getInt("failures"), 0);
+			Assert.assertTrue(detailedReportContent.contains("played 3 times"));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+		}
+	}
+
+	@Test(groups={"it"})
+	public void testStepReportFailureAfter3Retries() throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "3");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithException"});
+
+			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
+			JSONObject json = new JSONObject(detailedReportContent);
+
+			Assert.assertEquals(json.getInt("retries"), 3);
+			Assert.assertEquals(json.getString("status"), "FAILURE");
+			Assert.assertEquals(json.getString("rawStatus"), "FAILURE");
+			Assert.assertTrue(json.getInt("errors") > 0 || json.getInt("failures") > 0);
+			Assert.assertTrue(detailedReportContent.contains("played 4 times"));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+		}
+	}
+
+	@Test(groups={"it"})
 	public void testDriverStatsInReport(ITestContext testContext) throws Exception {
 		
 		try {
