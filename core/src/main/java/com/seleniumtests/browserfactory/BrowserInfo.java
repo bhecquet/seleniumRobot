@@ -44,7 +44,7 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Win32Exception;
 import com.sun.jna.platform.win32.WinReg;
 
-public class BrowserInfo {
+public class 	BrowserInfo {
 	
 	private static final String USER_NAME = "user.name";
 
