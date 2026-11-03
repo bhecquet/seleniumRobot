@@ -35,6 +35,7 @@ import org.testng.ITestResult;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.StatisticsStorage;
+import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -214,7 +215,10 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("startDate", newTestSteps.isEmpty() ? new Date(testResult.getStartMillis()): newTestSteps.get(0).getStartDate());
 			context.put("testSteps", newTestSteps);	
 			context.put("unencodedTestSteps", testSteps);	 // kept to avoid encoding to times step when JSON file is created and we use toJson methods
-			context.put("retries", TestNGResultUtils.getRetry(testResult) == null ? 0: TestNGResultUtils.getRetry(testResult));
+			Integer retries = TestNGResultUtils.getRetry(testResult);
+			if (retries == null && testResult.getMethod().getRetryAnalyzer(testResult) instanceof TestRetryAnalyzer retryAnalyzer) {
+				retries = retryAnalyzer.getCount();
+			}
 			context.put("browser", seleniumTestsContext.getBrowser());
 			context.put("mobileApp", StringUtility.encodeString(seleniumTestsContext.getApp(), reportFormat.toLowerCase()));
 			context.put("device", StringUtility.encodeString(seleniumTestsContext.getDeviceName() == null ? "": seleniumTestsContext.getDeviceName(), reportFormat.toLowerCase()));

@@ -9,6 +9,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.logging.DebugMode;
+import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
@@ -24,6 +25,7 @@ import org.testng.annotations.Test;
 
 import java.util.Arrays;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
@@ -40,6 +42,7 @@ public class TestWindowsAppCapabilitiesFactory extends MockitoTest {
 
     private MockedStatic mockedOsUtility;
     private MockedStatic mockedOsUtilityFactory;
+    private MockedStatic<OSCommand> mockedOsCommand;
 
     @BeforeMethod(groups= {"ut"})
     public void init() {
@@ -50,6 +53,9 @@ public class TestWindowsAppCapabilitiesFactory extends MockitoTest {
         mockedOsUtilityFactory = mockStatic(OSUtilityFactory.class);
         mockedOsUtilityFactory.when(() -> OSUtilityFactory.getInstance()).thenReturn(osUtility);
 
+        mockedOsCommand = mockStatic(OSCommand.class);
+        mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(any(String[].class))).thenReturn("12345");
+        
         when(osUtility.getProgramExtension()).thenReturn(".exe");
 
         when(config.getTestContext()).thenReturn(context);
@@ -60,7 +66,8 @@ public class TestWindowsAppCapabilitiesFactory extends MockitoTest {
 
     @AfterMethod(groups = "ut", alwaysRun = true)
     private void closeMocks() {
-        mockedOsUtilityFactory.close();
+    	mockedOsCommand.close();
+    	mockedOsUtilityFactory.close();
         mockedOsUtility.close();
     }
 
@@ -70,7 +77,7 @@ public class TestWindowsAppCapabilitiesFactory extends MockitoTest {
 
         Capabilities capabilities = new WindowsAppCapabilitiesFactory(config).createCapabilities();
         Assert.assertEquals(capabilities.getCapability("platformName").toString(), "windows");
-        Assert.assertEquals(capabilities.getCapability("appium:automationName"), "FlaUI");
+        Assert.assertEquals(capabilities.getCapability("appium:automationName"), "NovaWindows");
         Assert.assertEquals(capabilities.getCapability("appium:app"), "notepad");
     }
 
@@ -80,8 +87,8 @@ public class TestWindowsAppCapabilitiesFactory extends MockitoTest {
 
         Capabilities capabilities = new WindowsAppCapabilitiesFactory(config).createCapabilities();
         Assert.assertEquals(capabilities.getCapability("platformName").toString(), "windows");
-        Assert.assertEquals(capabilities.getCapability("appium:automationName"), "FlaUI");
-        Assert.assertEquals(capabilities.getCapability("appium:appTopLevelWindowTitleMatch"), "notepad");
+        Assert.assertEquals(capabilities.getCapability("appium:automationName"), "NovaWindows");
+        Assert.assertEquals(capabilities.getCapability("appium:appTopLevelWindow"), "12345");
     }
 
     @Test(groups = {"ut"}, expectedExceptions = ConfigurationException.class)
