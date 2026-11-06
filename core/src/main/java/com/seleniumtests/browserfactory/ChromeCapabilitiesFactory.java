@@ -61,7 +61,7 @@ public class ChromeCapabilitiesFactory extends ChromiumCapabilitiesFactory {
 				"--disable-web-security",
 				"--disable-site-isolation-trials",
 				"--disable-search-engine-choice-screen",
-				"--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades",
+				"--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades,HttpsFirstBalancedModeAutoEnable",
 				"--remote-allow-origins=*")); // workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111
 
 		if (webDriverConfig.getChromeOptions() != null) {
