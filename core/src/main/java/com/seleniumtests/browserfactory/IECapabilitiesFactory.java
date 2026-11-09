@@ -17,11 +17,11 @@
  */
 package com.seleniumtests.browserfactory;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerDriverService;
 import org.openqa.selenium.ie.InternetExplorerOptions;
 
@@ -29,12 +29,12 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.osutility.OSUtility;
 
 public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 
     public static final String SE_IE_OPTIONS = "se:ieOptions";
+	private String userDataDirOption = " ";
 
 	public IECapabilitiesFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
@@ -80,7 +80,30 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 			options.setCapability(SeleniumRobotCapabilityType.EDGE_IE_MODE, true);
 		}
 
-	    options.withInitialBrowserUrl(webDriverConfig.getInitialUrl());
+//		System.setProperty("webdriver.ie.driver.loglevel", "TRACE");
+//		System.setProperty("webdriver.ie.driver.logfile", "d:\\tmp\\iedriver.log");
+
+
+	}
+
+	@Override
+	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+		configureAttachExistingBrowser(options); // moved here because InternetExplorerOptions.merge removed the option (it's unknown from Selenium)
+
+		String profilePath = webDriverConfig.getEdgeProfilePath();
+
+		if (profilePath != null) {
+			if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(profilePath) && (profilePath.contains("/") || profilePath.contains("\\"))) {
+				userDataDirOption = String.format(" --disable-features= --user-data-dir=\"%s\"", profilePath);
+			} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(profilePath)) {
+				Path tempProfile = copyDefaultProfile(selectedBrowserInfo);
+				userDataDirOption = String.format(" --disable-features= --user-data-dir=\"%s\"", tempProfile.toString());
+			} else {
+				logger.warn("{} profile {} could not be set", getBrowserType(), profilePath);
+			}
+		}
+
+		((InternetExplorerOptions)options).withInitialBrowserUrl(userDataDirOption + " " + webDriverConfig.getInitialUrl());
 	}
 
 	@Override
@@ -112,11 +135,6 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 			((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("ie.ignoreprocessmatch", true); // add this option (https://github.com/SeleniumHQ/selenium/pull/12246) because
 																											 // without it, driver searches a process ID of -1
         }
-	}
-
-	@Override
-	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
-		configureAttachExistingBrowser(options); // moved here because InternetExplorerOptions.merge removed the option (it's unknown from Selenium)
 	}
 
 	@Override

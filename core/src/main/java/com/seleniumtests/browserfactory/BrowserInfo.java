@@ -133,6 +133,7 @@ public class 	BrowserInfo {
 				addChromeDefaultProfilePath();
 				break;
 			case EDGE:
+			case INTERNET_EXPLORER:
 				addEdgeDefaultProfilePath();
 				break;
 			case FIREFOX:

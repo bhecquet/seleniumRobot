@@ -120,6 +120,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		
 		// edge IE mode forced
 		SeleniumTestsContextManager.getThreadContext().setEdgeIeMode(true);
+		SeleniumTestsContextManager.getThreadContext().setEdgeUserProfilePath("default");
 //		SeleniumTestsContextManager.getThreadContext().setDebug("driver");
 
 		if (proxyType != null) {
