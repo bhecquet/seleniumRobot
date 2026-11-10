@@ -1964,7 +1964,7 @@ public class SeleniumTestsContext {
     }
     
     public void setEdgeUserProfilePath(String path) {
-    	if (path != null && (getBrowser() == BrowserType.EDGE || getBrowser() == BrowserType.INTERNET_EXPLORER)) {
+    	if (path != null && getBrowser() == BrowserType.EDGE) {
     		if ((new File(path).exists() && getRunMode() == DriverMode.LOCAL) || getRunMode() != DriverMode.LOCAL || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
     			setAttribute(EDGE_USER_PROFILE_PATH, path);
     		} else {

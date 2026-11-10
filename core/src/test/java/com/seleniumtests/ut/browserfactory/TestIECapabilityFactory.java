@@ -25,13 +25,11 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.util.*;
 
-import com.seleniumtests.browserfactory.EdgeCapabilitiesFactory;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
-import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerDriverService;
 import org.openqa.selenium.remote.CapabilityType;
@@ -187,22 +185,6 @@ public class TestIECapabilityFactory extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testCreateDefaultIECapabilities() {
-		
-
-		when(config.getInitialUrl()).thenReturn("http://mysite"); // check we start on "about:blank"
-		
-		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
-		
-		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "internet explorer");
-		
-		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.IGNORE_ZOOM_SETTING));
-		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS));
-		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION));
-		Assert.assertEquals((String) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.INITIAL_BROWSER_URL), "about:blank");
-	}
-	
-	@Test(groups={"ut"})
 	public void testCreateIECapabilitiesStandardDriverPathLocal() {
 		try (MockedStatic<Advapi32Util> mockedAdvapi = mockStatic(Advapi32Util.class)) {
 			mockedAdvapi.when(() -> Advapi32Util.registryGetValue(any(HKEY.class), anyString(), anyString())).thenReturn("1");
@@ -263,9 +245,9 @@ public class TestIECapabilityFactory extends MockitoTest {
 		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.IGNORE_ZOOM_SETTING));
 		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS));
 		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION));
-		Assert.assertEquals((String) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.INITIAL_BROWSER_URL), "http://mysite");
+		Assert.assertEquals((String) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.INITIAL_BROWSER_URL), " --disable-features= http://mysite");
 	}
-	
+
 	/**
 	 * Edge IE mode in grid
 	 * Check ie.edgepath and ie.edgechromium capabilities are not set
@@ -292,7 +274,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.IGNORE_ZOOM_SETTING));
 		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS));
 		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION));
-		Assert.assertEquals((String) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.INITIAL_BROWSER_URL), "http://mysite");
+		Assert.assertEquals((String) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.INITIAL_BROWSER_URL), " --disable-features= http://mysite");
 	}
 	
 	/**

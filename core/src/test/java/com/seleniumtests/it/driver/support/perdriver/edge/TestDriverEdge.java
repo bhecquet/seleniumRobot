@@ -125,7 +125,13 @@ public class TestDriverEdge extends TestDriver {
 	public void testRightClickWithMouse() {
 		super.testRightClickWithMouse();
 	}
-   
+
+	@Override
+	@Test(groups={"it"})
+	public void testGetAttribute() {
+		super.testGetAttribute();
+	}
+
 	@Override
     @Test(groups={"it", "ut"})
 	public void testSendKeys() {

@@ -273,7 +273,10 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
    
-	
+	public void testGetAttribute() {
+		Assert.assertEquals(DriverTestPage.textElement.getAttribute("name"), "textField");
+	}
+
 	public void testSendKeys() {
 		try {
 			DriverTestPage.textElement.sendKeys("youpi@[]é");

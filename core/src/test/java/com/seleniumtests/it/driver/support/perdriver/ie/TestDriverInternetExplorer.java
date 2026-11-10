@@ -120,7 +120,13 @@ public class TestDriverInternetExplorer extends TestDriver {
 	public void testClickWithMouse() {
 		super.testClickWithMouse();
 	}
-   
+
+	@Override
+    @Test(groups={"it"})
+	public void testGetAttribute() {
+		super.testGetAttribute();
+	}
+
 	@Override
     @Test(groups= {"ie"})
 	public void testSendKeys() {

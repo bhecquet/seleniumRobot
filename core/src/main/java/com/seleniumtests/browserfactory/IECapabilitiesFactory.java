@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.chromium.ChromiumOptions;
 import org.openqa.selenium.ie.InternetExplorerDriverService;
 import org.openqa.selenium.ie.InternetExplorerOptions;
 
@@ -34,7 +35,7 @@ import com.seleniumtests.util.osutility.OSUtility;
 public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 
     public static final String SE_IE_OPTIONS = "se:ieOptions";
-	private String userDataDirOption = " ";
+	public static final String DISABLE_FEATURES_USER_DATA_DIR_S = " --disable-features= --user-data-dir=\"%s\" ";
 
 	public IECapabilitiesFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
@@ -74,7 +75,7 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 			
 			// put in both location as Selenium3 does not handle edge chromium properly
 			options.attachToEdgeChrome()
-				.withEdgeExecutablePath(edgeBrowserInfos.get(0).getPath());
+				.withEdgeExecutablePath(edgeBrowserInfos.getFirst().getPath());
 
 		} else {
 			options.setCapability(SeleniumRobotCapabilityType.EDGE_IE_MODE, true);
@@ -83,6 +84,9 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 //		System.setProperty("webdriver.ie.driver.loglevel", "TRACE");
 //		System.setProperty("webdriver.ie.driver.logfile", "d:\\tmp\\iedriver.log");
 
+		// IEDriverServer sets a feature to prevent logging in to default account, which may break test if administrators request it
+		// we pass edge option with url as it's the only way to give edge arguments to server
+		options.withInitialBrowserUrl(" --disable-features= " + webDriverConfig.getInitialUrl());
 
 	}
 
@@ -90,20 +94,11 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
 		configureAttachExistingBrowser(options); // moved here because InternetExplorerOptions.merge removed the option (it's unknown from Selenium)
 
-		String profilePath = webDriverConfig.getEdgeProfilePath();
+	}
 
-		if (profilePath != null) {
-			if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(profilePath) && (profilePath.contains("/") || profilePath.contains("\\"))) {
-				userDataDirOption = String.format(" --disable-features= --user-data-dir=\"%s\"", profilePath);
-			} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(profilePath)) {
-				Path tempProfile = copyDefaultProfile(selectedBrowserInfo);
-				userDataDirOption = String.format(" --disable-features= --user-data-dir=\"%s\"", tempProfile.toString());
-			} else {
-				logger.warn("{} profile {} could not be set", getBrowserType(), profilePath);
-			}
-		}
-
-		((InternetExplorerOptions)options).withInitialBrowserUrl(userDataDirOption + " " + webDriverConfig.getInitialUrl());
+	@Override
+	protected void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+		configureAttachExistingBrowser(options); // moved here because InternetExplorerOptions.merge removed the option (it's unknown from Selenium)
 	}
 
 	@Override
@@ -135,10 +130,5 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 			((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("ie.ignoreprocessmatch", true); // add this option (https://github.com/SeleniumHQ/selenium/pull/12246) because
 																											 // without it, driver searches a process ID of -1
         }
-	}
-
-	@Override
-	protected void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
-		configureAttachExistingBrowser(options); // moved here because InternetExplorerOptions.merge removed the option (it's unknown from Selenium)
 	}
 }

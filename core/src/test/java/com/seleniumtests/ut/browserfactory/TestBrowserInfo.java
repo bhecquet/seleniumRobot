@@ -375,6 +375,16 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
+	public void testGetDefaultEdgeIEWindowsProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11.0", null);
+			Assert.assertTrue(bi.getDefaultProfilePath().replace("\\", "/").matches("C:/Users/.*?/AppData/Local/Microsoft/Edge/User Data"));
+		}
+	}
+
+	@Test(groups={"ut"})
 	public void testGetDefaultEdgeBetaWindowsProfile() {
 		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
 			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);

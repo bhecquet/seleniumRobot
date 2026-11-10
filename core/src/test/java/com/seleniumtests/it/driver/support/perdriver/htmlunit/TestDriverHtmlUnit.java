@@ -137,7 +137,13 @@ public class TestDriverHtmlUnit extends TestDriver {
 	public void testClickJsCheckbox() {
 		super.testClickJsCheckbox();
 	}
-   
+
+	@Override
+	@Test(groups={"it"})
+	public void testGetAttribute() {
+		super.testGetAttribute();
+	}
+
 	@Override
     @Test(groups={"it"})
 	public void testSendKeys() {

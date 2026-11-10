@@ -63,7 +63,6 @@ public class DriverExceptionListener implements WebDriverListener {
         		|| ex instanceof UnsupportedCommandException
         		|| ex.getMessage().contains(" read-only")
         		|| ex.getMessage().contains("not implemented")
-        		|| ex instanceof org.openqa.selenium.UnsupportedCommandException
         		|| ex instanceof MoveTargetOutOfBoundsException  // exception raised when element is non clickable
         		|| ex instanceof InvalidElementStateException    // exception raised when element is non clickable
         		) {
@@ -108,7 +107,7 @@ public class DriverExceptionListener implements WebDriverListener {
 
         } else {
             String message = ex.getMessage().split("\\n")[0];
-            logger.warn("Got exception:" + message);
+            logger.warn("Got exception: {}", message);
             if (
             		ex instanceof NoSuchSessionException
             		|| message.matches("Session .*? was terminated due to.*")
