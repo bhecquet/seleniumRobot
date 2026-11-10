@@ -611,7 +611,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"var action = 'capture_desktop_snapshot_to_base64_string';return '';";
     
     public CustomEventFiringWebDriver(final WebDriver driver) {
-    	this(driver, null, null, TestType.WEB, DriverMode.LOCAL, null);
+    	this(driver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.WEB, DriverMode.LOCAL, null);
     }
 
     public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, TestType testType, DriverMode localDriver, SeleniumGridConnector gridConnector) {

@@ -122,6 +122,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	private void init() {
 
 		when(driver.getCapabilities()).thenReturn(new DesiredCapabilities()); // add capabilities to allow augmenting driver
+		when(browserInfo.getBrowser()).thenReturn(BrowserType.CHROME);
 		
 		// add DriverExceptionListener to reproduce driver behavior
 		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, TestType.WEB, DriverMode.LOCAL, null));
@@ -319,7 +320,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testIsBrowserOrAppClosedMobileApp() {
 		when(mobileDriver.getWindowHandles()).thenReturn(new TreeSet<>()); // check we don't call getWindowHandles
 		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null));
 
 		Assert.assertFalse(eventDriver.isBrowserOrAppClosed());
 	}
@@ -327,7 +328,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testIsBrowserOrAppClosedMobileAppWithWebContext() {
 		when(mobileDriver.getWindowHandles()).thenReturn(new TreeSet<>()); // check we don't call getWindowHandles
 		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null));
 
 		Assert.assertFalse(eventDriver.isBrowserOrAppClosed());
 	}
@@ -504,7 +505,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testContentDimensionNonWebTest() {
 		when(mobileDriver.executeScript(anyString())).thenReturn(List.of(120L, 80L));
 		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APP, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.APP, DriverMode.LOCAL, null));
 
 		Dimension dim = eventDriver.getContentDimension();
 		
@@ -601,7 +602,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testContentDimensionWithoutScrollbarNonWebTest() {
 		when(mobileDriver.executeScript(anyString(), eq(true))).thenReturn(120L).thenReturn(80L);
 		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APP, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.APP, DriverMode.LOCAL, null));
 		Dimension dim = eventDriver.getViewPortDimensionWithoutScrollbar();
 		
 		// check we get the window dimension
@@ -653,7 +654,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"}, expectedExceptions=WebDriverException.class)
 	public void testScrollPositionNonWebTest() {
 		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APP, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.APP, DriverMode.LOCAL, null));
 		when(driver.executeScript(anyString())).thenReturn(List.of(120L, 80L));
 		eventDriver.getScrollPosition();
 
@@ -1587,7 +1588,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testHideKeyboardMobile() {
 		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null));
 		eventDriver.hideKeyboard();
 		verify(((HidesKeyboard)mobileDriver), never()).hideKeyboard();
 	}
@@ -1595,14 +1596,14 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testHideKeyboardWebMobile() {
 		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_WEB_ANDROID, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.APPIUM_WEB_ANDROID, DriverMode.LOCAL, null));
 		eventDriver.hideKeyboard();
 		verify(((HidesKeyboard)mobileDriver)).hideKeyboard();
 	}
 
 	@Test(groups = {"ut"})
 	public void testHideKeyboardDesktop() {
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.WEB, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.WEB, DriverMode.LOCAL, null));
 		eventDriver.hideKeyboard();
 		verify(((HidesKeyboard)mobileDriver), never()).hideKeyboard();
 	}
@@ -1610,7 +1611,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testContextMobile() {
 		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null));
 		WebDriver wd = eventDriver.context("foo");
 		Assert.assertEquals(wd, eventDriver);
 		verify(((SupportsContextSwitching)mobileDriver)).context("foo");
@@ -1618,7 +1619,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	@Test(groups = {"ut"})
 	public void testContextDesktop() {
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.WEB, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.WEB, DriverMode.LOCAL, null));
 		WebDriver wd = eventDriver.context("foo");
 		Assert.assertEquals(wd, eventDriver);
 		verify(((SupportsContextSwitching)mobileDriver), never()).context("foo");
@@ -1627,7 +1628,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testContextHandlesMobile() {
 		when(mobileDriver.getContextHandles()).thenReturn(new TreeSet<>(List.of("NATIVE_APP", "WEBVIEW")));
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null));
 		Set<String> handles = eventDriver.getContextHandles();
 		verify(((SupportsContextSwitching)mobileDriver)).getContextHandles();
 		Assert.assertEquals(handles.size(), 2);
@@ -1637,7 +1638,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	@Test(groups = {"ut"})
 	public void testContextHandlesDesktop() {
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.WEB, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.WEB, DriverMode.LOCAL, null));
 		eventDriver.context("foo");
 		Set<String> handles = eventDriver.getContextHandles();
 		verify(((SupportsContextSwitching)mobileDriver), never()).getContextHandles();
@@ -1649,7 +1650,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testGetContextMobile() {
 		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null));
 		String context = eventDriver.getContext();
 		Assert.assertEquals(context, "NATIVE_APP");
 		verify(((SupportsContextSwitching)mobileDriver), times(2)).getContext(); // one for isWebTest(), one for getContext()
@@ -1657,7 +1658,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	@Test(groups = {"ut"})
 	public void testGetContextDesktop() {
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.WEB, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.WEB, DriverMode.LOCAL, null));
 		String context = eventDriver.getContext();
 		Assert.assertEquals(context, "WEB");
 		verify(((SupportsContextSwitching)mobileDriver), never()).getContext();
@@ -1665,7 +1666,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	@Test(groups = {"ut"})
 	public void testGetContextWindowsApp() {
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_WINDOWS, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.APPIUM_APP_WINDOWS, DriverMode.LOCAL, null));
 		String context = eventDriver.getContext();
 		Assert.assertEquals(context, "APP");
 		verify(((SupportsContextSwitching)mobileDriver), never()).getContext();
@@ -1765,7 +1766,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testGeoLocationDriverExited() {
 		eventDriver.setDriverExited();
 		eventDriver.setGeolocation(10.0, 12.0);
-		verify(browserInfo, never()).getBrowser();
+		verify(browserInfo, atMostOnce()).getBrowser(); // 1 call on driver init
 	}
 
 	/**
@@ -1864,7 +1865,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testIsWebTestMobileWebDriverExited() {
 		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
-		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null));
 		eventDriver.setDriverExited();
 		clearInvocations(mobileDriver); // ignore calls made during construction / driver exit handling
 
