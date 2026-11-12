@@ -1766,7 +1766,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testGeoLocationDriverExited() {
 		eventDriver.setDriverExited();
 		eventDriver.setGeolocation(10.0, 12.0);
-		verify(browserInfo, atMostOnce()).getBrowser(); // 1 call on driver init
+		verify(browserInfo, times(2)).getBrowser(); // 1 call on driver init
 	}
 
 	/**

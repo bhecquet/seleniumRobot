@@ -278,7 +278,7 @@ public class TestHtmlElement extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testFindSubElement() {
 		HtmlElement subEl = el.findElement(By.name("subEl"));
-		Assert.assertEquals(subEl.getElement().toString(), "Decorated {subElement1}");
+		Assert.assertEquals(subEl.getElement().toString(), "Decorated {Decorated {subElement1}}");
 		finalCheck(true);
 	}
 
@@ -288,7 +288,7 @@ public class TestHtmlElement extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testFindNthSubElement() {
 		HtmlElement subEl = el.findElement(By.name("subEl"), 1);
-		Assert.assertEquals(subEl.getElement().toString(), "Decorated {subElement2}");
+		Assert.assertEquals(subEl.getElement().toString(), "Decorated {Decorated {subElement2}}");
 		finalCheck(true);
 	}
 
@@ -757,7 +757,7 @@ public class TestHtmlElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 
 		HtmlElement present = new HtmlElement("element", locator);
-		eventDriver = new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null);
+		eventDriver = new CustomEventFiringWebDriver(mobileDriver, null, new BrowserInfo(BrowserType.CHROME, "155.0"), TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null);
 		present.setDriver(eventDriver); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), expectedLocator);
