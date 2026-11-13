@@ -110,7 +110,7 @@ public abstract class Element {
     	if (!SeleniumTestsContextManager.isMobileTest()) {
     		throw new ScenarioException("action is available only for mobile platforms");
     	}
-    	if (!(((Decorated<WebDriver>)driver.getWebDriver()).getOriginal() instanceof AppiumDriver)) {
+    	if (!(driver.getOriginalDriver() instanceof AppiumDriver)) {
     		throw new ScenarioException("action is available only for appium drivers");
     	}
     	findElement(true);

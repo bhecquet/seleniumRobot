@@ -1562,11 +1562,11 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
     /**
      * findElement returns a EventFiringWebElement which is not compatible with MobileElement
-     * Get the unerlying element and return it
+     * Get the underlying element and return it
      */
 	private WebElement getUnderlyingElement(WebElement localElement) {
     	try {
-    		return ((Decorated<WebElement>)localElement).getOriginal();
+    		return ((Decorated<WebElement>)((Decorated<WebElement>)localElement).getOriginal()).getOriginal();
     	} catch (ClassCastException e) {
     		return localElement;
     	}
