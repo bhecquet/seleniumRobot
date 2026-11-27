@@ -318,9 +318,12 @@ public class SquashTMConnector extends TestManager {
     public void updateTestCase(ITestResult testResult) {
 
         try {
-            if (!getUpdateTestManager(testResult)) {
+        	// Update test case only if updateTestManager is true and test result is success
+            if (!getUpdateTestManager(testResult) || !testResult.isSuccess()) {
                 return;
             }
+            SquashTMApi sapi = getApi();
+            project = Project.get(projectName);
             Integer testCaseId = getTestCaseId(testResult);
             if (testCaseId == null) {
                 logger.warn("Test Case won't be updated, no testCaseId configured for {}", TestNGResultUtils.getTestName(testResult));
